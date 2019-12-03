@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=cairoplot
+Exec=cairoplot
+Icon=plotter
+Terminal=false
+Comment=Extend gtkmm to easily create 2D plots using cairomm
+Keywords=GUI programming;gtkmm;plotting;graphs;C++;
+Type=Application
+Categories=GNOME;GTK;Development;
+StartupNotify=true

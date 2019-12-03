@@ -1,0 +1,7 @@
+data/org.gnome.plotter.desktop.in
+data/org.gnome.plotter.appdata.xml.in
+data/org.gnome.plotter.gschema.xml
+src/cairoplot-window.cpp
+src/plotter.cpp
+src/plotterthemes.cpp
+src/plotterlabels.cpp
