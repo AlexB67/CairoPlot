@@ -61,7 +61,21 @@ public:
     CairoGraph &operator=(CairoGraph &&) = delete;
 
     // public methods
-    virtual Gtk::Grid &create_graph();
+    // complete graph with motion tracker
+    Gtk::Grid &create_graph();
+    
+    // motion tracker widget that diplays the x and y values following the cursor
+    Gtk::Grid &get_motion_tracker();
+
+    // widgets one can use and have access to for custom layouts
+    Gtk::Grid &get_cursor_grid() {return *cursor_grid;}
+    Gtk::Grid &get_graph_grid() {return *grid;}
+    Gtk::Entry &get_xvalue_entry() {return *xvalue;}
+    Gtk::Entry &get_yvalue_entry() {return *yvalue;}
+    Gtk::Label &get_xvalue_label() {return *xvaluelabel;}
+    Gtk::Label &get_yvalue_label() {return *yvaluelabel;}
+
+    // graph methods
     void update_graph();
     void set_background_style(const Gdk::RGBA colour1, const Gdk::RGBA colour2);
     void set_background_style(const Gdk::RGBA colour1);
@@ -73,7 +87,7 @@ public:
     void add_series(const std::vector<double> &xvalues, const std::vector<double> &yvalues,
                     const Gdk::RGBA linecolour, const CairoGraphLineStyle style);
 
-    void add_multi_legends(const std::vector<Glib::ustring> &legends);
+    void add_multi_legends(const std::vector<Glib::ustring> &legends, const double offsetx = 0.0, const double offsety = 0.0);
     void add_single_legend(const Glib::ustring &legend, CairoGraphPos pos, const bool showlinecolour);
     void show_legend(const bool show);
     void add_text(/*const Glib::ustring& text, const double x, const double y */); // todo
@@ -97,6 +111,8 @@ private:
     double start_y;
     double end_x;
     double end_y;
+    double legend_offsetx = 0.0;
+    double legend_offsety = 0.0;
     bool selection_mode = false;
     bool draw_zoom = false;
     bool forcescientificx = false;
@@ -137,6 +153,7 @@ private:
     CairoGraphPos legend_pos;
     Glib::ustring current_theme;
     Gtk::Grid *grid;
+    Gtk::Grid *cursor_grid;
     Gtk::Entry *xvalue;
     Gtk::Entry *yvalue;
     Gtk::Label *xvaluelabel;

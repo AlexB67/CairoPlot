@@ -99,10 +99,12 @@ void CairoGraph::show_legend(const bool show)
     showlegend = show;
 }
 
-void CairoGraph::add_multi_legends(const std::vector<Glib::ustring> &legends)
+void CairoGraph::add_multi_legends(const std::vector<Glib::ustring> &legends, const double offsetx, const double offsety)
 {
     graph_legends.clear();
-    for ( auto &i: legends) graph_legends.emplace_back(i); 
+    for ( auto &i: legends) graph_legends.emplace_back(i);
+    legend_offsetx = offsetx * GRAPH_WIDTH;
+    legend_offsety = offsety * GRAPH_HEIGHT;
 }
 
 void CairoGraph::add_text(/* const Glib::ustring& text, const double x, const double y */)

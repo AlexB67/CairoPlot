@@ -19,6 +19,7 @@
 #include "cairoplot-window.hpp"
 #include <iostream>
 #include <gtkmm/settings.h>
+#include <gtkmm/messagedialog.h>
 
 CairoplotWindow::CairoplotWindow(const Glib::RefPtr<Gtk::Application>& app)
 	: Glib::ObjectBase("CairoplotWindow")
@@ -64,6 +65,7 @@ CairoplotWindow::CairoplotWindow(const Glib::RefPtr<Gtk::Application>& app)
 	graphboxstyle = Gtk::make_managed<Gtk::ComboBoxText>();
 
 	graphframe.add(graph->create_graph());
+	graph->get_graph_grid().set_border_width(10);
 	graph->set_title(_("Displacement versus time"));
 	
 	selectlinestyle->insert(0, "Solid line");
@@ -156,7 +158,6 @@ CairoplotWindow::CairoplotWindow(const Glib::RefPtr<Gtk::Application>& app)
 	selectgraph->signal_changed().connect([this](){
 		if (0 == selectgraph->get_active_row_number()) single_series = true;
 		else single_series = false;
-		graph->set_axes_labels(_("<i>t</i> / s"), _("<i>s</i> / m"));
 		make_plot();
 	});
 
@@ -317,11 +318,22 @@ void CairoplotWindow::create_header_and_menus()
 	winmenu = Gio::Menu::create();
 
 	winmenu->append(_("_About"), "win.about");
+	winmenu->append(_("_Help"), "win.help");
 	winmenu->append(_("_Quit"), "win.quit");
 
 	menubutton.set_menu_model(winmenu);
 
 	m_app->set_accel_for_action("win.quit", "<Ctrl>q");
+
+
+	add_action("help", [this](){
+		Glib::ustring message;
+		message = _("To zoom in hold down the left mouse button and drag an area, then release. Right click resets. " 
+					"There is only one zoom level.\n\n"  
+					"Use the controls on the right to change graph properties.");
+		Gtk::MessageDialog message_dialog(message, true, Gtk::MESSAGE_INFO, Gtk::BUTTONS_CLOSE, true);
+    	message_dialog.run();
+	});
 
 	add_action("quit", sigc::mem_fun(*this, &CairoplotWindow::close));
 	add_action("about", sigc::mem_fun(*this,&CairoplotWindow::about));
@@ -365,42 +377,48 @@ void CairoplotWindow::make_plot()
 	double velocity = start_velocity->get_value();
 	double accel = gravitational_constant->get_value();
 
-	size_t size = 100;
+	constexpr size_t size = 100;
+	constexpr size_t numplots = 3;
 	std::vector<double> t(size);
 	std::vector<double> a(size);
-	std::vector<double> t1(size);
-	std::vector<double> a1(size);
-	std::vector<double> t2(size);
-	std::vector<double> a2(size);
+	std::vector<std::vector<double> > xseries(numplots, t);
+	std::vector<std::vector<double> > yseries(numplots, a);
 
-	std::vector<std::vector<double> > xseries;
-	std::vector<std::vector<double> > yseries;
 
 	double j = start_time->get_value();
 
-	for (size_t i = 0; i < size; ++i)
+	if ( true == single_series) 
 	{
-		t[i]  = j;
-		t1[i] = j;
-		t2[i] = j;
-		a[i]  = velocity + 0.5 * accel * t[i] * t[i];
-		a1[i] = velocity + 0.5 * 3.71 * t1[i] * t1[i];
-		a2[i] = velocity + 0.5 * 5.55 * t2[i] * t2[i];
-
-		j +=  0.25 * 100.0 / 99.0;
+		for (size_t i = 0; i < size; ++i)
+		{
+			t[i]  = j;
+			a[i]  = velocity + 0.5 * accel * t[i] * t[i];
+			j +=  0.25 * 100.0 / 99.0;
+		}	
+		
 	}
+	else // multi series
+	{
+		for (size_t k = 0; k < numplots; ++k)
+		{
+			j = start_time->get_value();
 
-	xseries.emplace_back(t);
-	yseries.emplace_back(a);
-
-	xseries.emplace_back(t1);
-	yseries.emplace_back(a1);
-
-	xseries.emplace_back(t2);
-	yseries.emplace_back(a2);
+			for (size_t i = 0; i < size; ++i)
+			{	
+				double tmp  = accel;
+				if (k == 1) tmp = 3.71;
+				if (k == 2) tmp = 5.55;
+				xseries[k][i] = j;
+				yseries[k][i] =  velocity + 0.5 * tmp * xseries[k][i] * xseries[k][i];
+				j +=  0.25 * 100.0 / 99.0;
+			}
+		}
+	}
 
 	graph->set_tick_label_format_x(false, 2);
 	graph->set_tick_label_format_y(true, 0);
+
+	graph->set_axes_labels(_("<i>t</i> / s"), _("<i>s</i> / m"), "Latin Modern Roman");
 
 	if ( true == single_series ) 
 	{
@@ -419,7 +437,9 @@ void CairoplotWindow::make_plot()
 		legends.emplace_back(legend);
 		legends.emplace_back(legend1);
 		legends.emplace_back(legend2);
+
 		graph->add_multi_series(xseries, yseries);
+		
 		if (false == hidelegend->get_active()) graph->add_multi_legends(legends);
 	}
 

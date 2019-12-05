@@ -8,6 +8,7 @@ using namespace CarioGraphConstants;
 CairoGraph::CairoGraph()
 {   
     grid    = Gtk::make_managed<Gtk::Grid>();
+    cursor_grid = Gtk::make_managed<Gtk::Grid>();
     xvalue  = Gtk::make_managed<Gtk::Entry>();
     yvalue  = Gtk::make_managed<Gtk::Entry>();
     xvaluelabel = Gtk::make_managed<Gtk::Label>();
@@ -448,7 +449,10 @@ void CairoGraph::clear_graph()
     plot.zoom_factor_x = 1.0;
     plot.zoom_factor_y = 1.0;
     zstack.clear();
+    legend_offsetx = 0.0;
+    legend_offsety = 0.0;
 }
+
 void CairoGraph::update_graph()
 {
      queue_draw_area(0, 0, get_allocation().get_width(), get_allocation().get_height());

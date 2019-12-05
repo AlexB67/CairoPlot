@@ -4,6 +4,7 @@ Gtk::Grid &CairoGraph::create_graph()
 {
     set_hexpand(true);
     set_vexpand(true);
+    set_size_request(256, 256); // give it something to being with
     xvalue->set_can_focus(false);
     yvalue->set_can_focus(false);
 
@@ -15,7 +16,6 @@ Gtk::Grid &CairoGraph::create_graph()
 
     grid->set_row_spacing(20);
     grid->set_column_spacing(20);
-    grid->set_border_width(10);
     grid->attach(*this, 0, 0, 4, 1);
     grid->attach(*xvaluelabel, 0, 1);
     grid->attach(*xvalue, 1, 1);
@@ -23,4 +23,16 @@ Gtk::Grid &CairoGraph::create_graph()
     grid->attach(*yvalue, 3, 1);
 
     return *grid;
+}
+
+Gtk::Grid &CairoGraph::get_motion_tracker()
+{
+    xvalue->set_width_chars(12);
+    yvalue->set_width_chars(12);
+    cursor_grid->attach(*xvaluelabel, 0, 0);
+    cursor_grid->attach(*xvalue, 1, 0);
+    cursor_grid->attach(*yvaluelabel, 2, 0);
+    cursor_grid->attach(*yvalue, 3, 0);
+
+    return *cursor_grid;
 }

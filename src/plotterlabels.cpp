@@ -281,6 +281,8 @@ void CairoGraph::create_labels(const Cairo::RefPtr<Cairo::Context> &cr)
         cr->scale(w, h);
     }
 
+    //font.set_size(0.8 * font.get_size());
+
     if ( graph_legend.size() && true == showlegend)
     {
         if (false == legend_show_colour) cr->set_source_rgba(0.0, 0.0, 0.0, 0.0);
@@ -290,13 +292,13 @@ void CairoGraph::create_labels(const Cairo::RefPtr<Cairo::Context> &cr)
         if (legend_pos == CairoGraphPos::LEGEND_TOP)
         {
             // since we are using the same font as above
-            cr->move_to(OFFSET_X + TICKS_LENGTH, OFFSET_Y + TICKS_LENGTH + 0.5 * label_height / h); 
-            cr->line_to(OFFSET_X + 3.0 * TICKS_LENGTH, OFFSET_Y + TICKS_LENGTH + 0.5 * label_height / h);
+            cr->move_to(OFFSET_X + TICKS_LENGTH, OFFSET_Y + TICKS_LENGTH + 0.49 * label_height / h); 
+            cr->line_to(OFFSET_X + 3.0 * TICKS_LENGTH, OFFSET_Y + TICKS_LENGTH + 0.49 * label_height / h);
         }
         else
         {
-            cr->move_to(OFFSET_X + TICKS_LENGTH, OFFSET_Y + GRAPH_HEIGHT - TICKS_LENGTH - 0.5 * label_height / h);
-            cr->line_to(OFFSET_X + 3.0 * TICKS_LENGTH, OFFSET_Y + GRAPH_HEIGHT - TICKS_LENGTH - 0.5 * label_height / h);
+            cr->move_to(OFFSET_X + TICKS_LENGTH, OFFSET_Y + GRAPH_HEIGHT - TICKS_LENGTH - 0.75 * label_height / h);
+            cr->line_to(OFFSET_X + 3.0 * TICKS_LENGTH, OFFSET_Y + GRAPH_HEIGHT - TICKS_LENGTH - 0.75 * label_height / h);
         }
         cr->stroke();
 
@@ -307,8 +309,12 @@ void CairoGraph::create_labels(const Cairo::RefPtr<Cairo::Context> &cr)
         legendlayout->set_font_description(font);
         legendlayout->set_markup(graph_legend);
         cr->get_current_point(xpos, ypos);
-        cr->move_to(xpos, ypos);
-        if (legend_pos == CairoGraphPos::LEGEND_BOTTOM) cr->move_to(xpos, ypos + h * (GRAPH_HEIGHT - TICKS_LENGTH) - label_height);
+
+        if (legend_pos == CairoGraphPos::LEGEND_BOTTOM) 
+            cr->move_to(xpos, ypos + h * (GRAPH_HEIGHT - TICKS_LENGTH) - label_height);
+        else
+            cr->move_to(xpos, ypos);
+        
         legendlayout->show_in_cairo_context(cr);
         cr->scale(w, h);
     }
@@ -320,20 +326,24 @@ void CairoGraph::create_labels(const Cairo::RefPtr<Cairo::Context> &cr)
         {
             if (graph_legends[i].length())
             {
-                cr->move_to(OFFSET_X + TICKS_LENGTH, OFFSET_Y + TICKS_LENGTH + 0.49 * offset * label_height / h); // since we are using the same font as above
+                cr->move_to(legend_offsetx + OFFSET_X + TICKS_LENGTH, 
+                            legend_offsety + OFFSET_Y + TICKS_LENGTH + 0.475 * offset * label_height / h); // since we are using the same font as above
                 cr->set_source_rgba(seriescolour[i].get_red(), seriescolour[i].get_green(), 
                                     seriescolour[i].get_blue(), seriescolour[i].get_alpha());
-                cr->line_to(OFFSET_X + 3.0 * TICKS_LENGTH, OFFSET_Y + TICKS_LENGTH + 0.49 * offset * label_height / h);
+                cr->line_to(legend_offsetx + OFFSET_X + 3.0 * TICKS_LENGTH, 
+                            legend_offsety + OFFSET_Y + TICKS_LENGTH + 0.475 * offset * label_height / h);
                 cr->stroke();
                 
-                cr->move_to(OFFSET_X + 4.0 * TICKS_LENGTH, OFFSET_Y + 0.5 * (offset - 1.0) * label_height / h);
+                cr->move_to(legend_offsetx + OFFSET_X + 4.0 * TICKS_LENGTH, 
+                            legend_offsety + OFFSET_Y + 0.5 * offset * label_height / h);
+                
                 cr->scale(1.0 / w, 1.0 / h);
                 cr->set_source_rgba(axes_colour.get_red(), axes_colour.get_green(), axes_colour.get_blue(), 1.0);
                 auto legendlayout =  create_pango_layout(graph_legends[i]);
                 legendlayout->set_font_description(font);
                 legendlayout->set_markup(graph_legends[i]);
                 cr->get_current_point(xpos, ypos);
-                cr->move_to(xpos, ypos);
+                cr->move_to(xpos + legend_offsetx / w, ypos + legend_offsety / h - 0.5 * label_height);
                 legendlayout->show_in_cairo_context(cr);
                 cr->scale(w, h);
                 offset += 2.00;
