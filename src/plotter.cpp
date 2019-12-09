@@ -178,11 +178,11 @@ bool CairoGraph::on_draw(const Cairo::RefPtr<Cairo::Context> &cr)
         cr->scale(w, h);
         
         // Draw the selection rectangle 
-        if (current_theme == "Adwaita")
-            cr->set_source_rgba(0.80, 0.80, 0.80, 0.35);
+        if (axes_colour.get_red() < 0.25 && axes_colour.get_green() < 0.25 && axes_colour.get_blue() < 0.25)
+            cr->set_source_rgba(0.1, 0.1, 0.1, 0.25); // probably a light theme
         else
             cr->set_source_rgba(0.0, 1.0, 1.0, 0.25);
-
+            
         cr->set_line_width(0.0005);
         cr->rectangle(start_x, start_y, end_x - start_x, end_y - start_y);
         cr->fill();
