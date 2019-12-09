@@ -99,6 +99,11 @@ void CairoGraph::show_legend(const bool show)
     showlegend = show;
 }
 
+void CairoGraph::set_legend_scale(const double scale)
+{
+    legend_scale = scale;
+}
+
 void CairoGraph::add_multi_legends(const std::vector<Glib::ustring> &legends, const double offsetx, const double offsety)
 {
     graph_legends.clear();
@@ -107,11 +112,9 @@ void CairoGraph::add_multi_legends(const std::vector<Glib::ustring> &legends, co
     legend_offsety = offsety * GRAPH_HEIGHT;
 }
 
-void CairoGraph::add_text(/* const Glib::ustring& text, const double x, const double y */)
+void CairoGraph::add_text_objects(const std::vector<std::tuple<Glib::ustring, double, double, double, bool> >& text)
 {
-    // TO DO
-   //  double mx, my;
-   //  mx = OFFSET_X + x / GRAPH_WIDTH;
-   //  my = OFFSET_Y + y / GRAPH_HEIGHT;
-     
+    // Add the text at position x, y with respect to the graph top left corner, and scale text
+
+    for (auto &i : text) text_objects.emplace_back(i);  
 }

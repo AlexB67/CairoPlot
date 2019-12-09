@@ -418,7 +418,7 @@ void CairoplotWindow::make_plot()
 	graph->set_tick_label_format_x(false, 2);
 	graph->set_tick_label_format_y(true, 0);
 
-	graph->set_axes_labels(_("<i>t</i> / s"), _("<i>s</i> / m"), "Latin Modern Roman");
+	graph->set_axes_labels(_("<i>t</i> / s"), _("<i>s</i> / m"));
 
 	if ( true == single_series ) 
 	{

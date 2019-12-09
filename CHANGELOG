@@ -1,0 +1,3 @@
+- 9/12/2019
+Optimisation - We now write to a canvas and don't redraw when zooming
+- Various fixes, more to come

@@ -281,76 +281,106 @@ void CairoGraph::create_labels(const Cairo::RefPtr<Cairo::Context> &cr)
         cr->scale(w, h);
     }
 
-    //font.set_size(0.8 * font.get_size());
-
     if ( graph_legend.size() && true == showlegend)
     {
-        if (false == legend_show_colour) cr->set_source_rgba(0.0, 0.0, 0.0, 0.0);
-        else cr->set_source_rgba(seriescolour[0].get_red(), seriescolour[0].get_green(), 
-                            seriescolour[0].get_blue(), seriescolour[0].get_alpha());
-
-        if (legend_pos == CairoGraphPos::LEGEND_TOP)
-        {
-            // since we are using the same font as above
-            cr->move_to(OFFSET_X + TICKS_LENGTH, OFFSET_Y + TICKS_LENGTH + 0.49 * label_height / h); 
-            cr->line_to(OFFSET_X + 3.0 * TICKS_LENGTH, OFFSET_Y + TICKS_LENGTH + 0.49 * label_height / h);
-        }
-        else
-        {
-            cr->move_to(OFFSET_X + TICKS_LENGTH, OFFSET_Y + GRAPH_HEIGHT - TICKS_LENGTH - 0.75 * label_height / h);
-            cr->line_to(OFFSET_X + 3.0 * TICKS_LENGTH, OFFSET_Y + GRAPH_HEIGHT - TICKS_LENGTH - 0.75 * label_height / h);
-        }
-        cr->stroke();
-
-        cr->move_to(OFFSET_X + 4.0 * TICKS_LENGTH, OFFSET_Y);
+        font.set_size(legend_scale * font.get_size());
         cr->scale(1.0 / w, 1.0 / h);
         cr->set_source_rgba(axes_colour.get_red(), axes_colour.get_green(), axes_colour.get_blue(), 1.0);
         auto legendlayout =  create_pango_layout(graph_legend);
         legendlayout->set_font_description(font);
         legendlayout->set_markup(graph_legend);
-        cr->get_current_point(xpos, ypos);
+        legendlayout->get_pixel_size(label_width, label_height);
 
         if (legend_pos == CairoGraphPos::LEGEND_BOTTOM) 
-            cr->move_to(xpos, ypos + h * (GRAPH_HEIGHT - TICKS_LENGTH) - label_height);
+            cr->move_to(w * (OFFSET_X + 4.0 * TICKS_LENGTH), h * (OFFSET_Y + GRAPH_HEIGHT - TICKS_LENGTH) - label_height);
         else
-            cr->move_to(xpos, ypos);
+            cr->move_to(w * (OFFSET_X + 4.0 * TICKS_LENGTH), h * (OFFSET_Y + TICKS_LENGTH));
         
         legendlayout->show_in_cairo_context(cr);
+
+        if (true == legend_show_colour) 
+            cr->set_source_rgba(seriescolour[0].get_red(), seriescolour[0].get_green(), 
+                                seriescolour[0].get_blue(), seriescolour[0].get_alpha());
+        else
+            cr->set_source_rgba(0.0,0.0, 0.0, 0.0);
+        
+        cr->set_line_width(2.0);
+
+        if (legend_pos == CairoGraphPos::LEGEND_BOTTOM)
+        {
+            cr->move_to(w * (OFFSET_X + TICKS_LENGTH), h * (OFFSET_Y + GRAPH_HEIGHT - TICKS_LENGTH) - 0.5 * label_height - 2.0);
+            cr->line_to(w * (OFFSET_X + 3.0 * TICKS_LENGTH), h * (OFFSET_Y + GRAPH_HEIGHT - TICKS_LENGTH) - 0.5 * label_height - 2.0);
+        }
+        else
+        {
+            cr->move_to(w * (OFFSET_X + TICKS_LENGTH), h * (OFFSET_Y + TICKS_LENGTH) + 0.5 * label_height - 2.0);
+            cr->line_to(w * (OFFSET_X + 3.0 * TICKS_LENGTH), h * (OFFSET_Y + TICKS_LENGTH) + 0.5 * label_height - 2.0);
+        }
+
+        cr->stroke();
         cr->scale(w, h);
     }
 
     if (graph_legends.size() && true == showlegend)
     {
+        font.set_size(legend_scale * font.get_size());
         double offset = 1.0;
         for ( size_t i = 0; i < graph_legends.size(); ++i)
         {
             if (graph_legends[i].length())
             {
-                cr->move_to(legend_offsetx + OFFSET_X + TICKS_LENGTH, 
-                            legend_offsety + OFFSET_Y + TICKS_LENGTH + 0.475 * offset * label_height / h); // since we are using the same font as above
-                cr->set_source_rgba(seriescolour[i].get_red(), seriescolour[i].get_green(), 
-                                    seriescolour[i].get_blue(), seriescolour[i].get_alpha());
-                cr->line_to(legend_offsetx + OFFSET_X + 3.0 * TICKS_LENGTH, 
-                            legend_offsety + OFFSET_Y + TICKS_LENGTH + 0.475 * offset * label_height / h);
-                cr->stroke();
-                
-                cr->move_to(legend_offsetx + OFFSET_X + 4.0 * TICKS_LENGTH, 
-                            legend_offsety + OFFSET_Y + 0.5 * offset * label_height / h);
-                
                 cr->scale(1.0 / w, 1.0 / h);
-                cr->set_source_rgba(axes_colour.get_red(), axes_colour.get_green(), axes_colour.get_blue(), 1.0);
                 auto legendlayout =  create_pango_layout(graph_legends[i]);
                 legendlayout->set_font_description(font);
                 legendlayout->set_markup(graph_legends[i]);
-                cr->get_current_point(xpos, ypos);
-                cr->move_to(xpos + legend_offsetx / w, ypos + legend_offsety / h - 0.5 * label_height);
+                legendlayout->get_pixel_size(label_width,label_height);
+
+                cr->set_source_rgba(axes_colour.get_red(), axes_colour.get_green(), axes_colour.get_blue(), 1.0);
+                cr->move_to(w * (legend_offsetx + OFFSET_X + 4.0 * TICKS_LENGTH), 
+                            h * (legend_offsety + OFFSET_Y + 0.50 * offset * label_height / h));
+                
                 legendlayout->show_in_cairo_context(cr);
+
+                cr->set_line_width(2.0);
+                cr->set_source_rgba(seriescolour[i].get_red(), seriescolour[i].get_green(), 
+                                    seriescolour[i].get_blue(), seriescolour[i].get_alpha());
+
+                cr->move_to(w * (legend_offsetx + OFFSET_X + TICKS_LENGTH), 
+                            h * (legend_offsety + OFFSET_Y + TICKS_LENGTH  + 0.50 * offset * label_height / h) + 6.0);
+                
+                cr->line_to(w * (legend_offsetx + OFFSET_X + 3.0 * TICKS_LENGTH), 
+                            h * (legend_offsety + OFFSET_Y + TICKS_LENGTH + 0.50 * offset * label_height / h) + 6.0);
+                cr->stroke();
+
                 cr->scale(w, h);
-                offset += 2.00;
+                offset += 2.0;
             }
         }
     }
 
+   
+   for (auto &i : text_objects)
+   {
+        Pango::FontDescription text_font;
+        Glib::ustring text = std::get<0>(i);
+        double x = std::get<1>(i) * GRAPH_WIDTH + OFFSET_X;
+        double y = std::get<2>(i) * GRAPH_HEIGHT + OFFSET_Y;
+        double scale = std::get<3>(i);
+        cr->move_to(x, y);
+        cr->scale(1.0 / w, 1.0 / h);
+        cr->set_source_rgba(axes_colour.get_red(), axes_colour.get_green(), axes_colour.get_blue(), axes_colour.get_alpha());
+        text_font.set_size(scale *  font.get_size());
+        auto textlayout = create_pango_layout(text);
+        textlayout->set_font_description(text_font);
+        textlayout->set_markup(text);
+        textlayout->get_pixel_size(label_width, label_height);
+        cr->get_current_point(xpos, ypos);
+        cr->move_to(xpos, ypos - label_height);
+        if (std::get<4>(i) == draw_zoom && true == showlegend) textlayout->show_in_cairo_context(cr);
+        cr->scale(w, h);
+   }
+
+    font.set_size(font.get_size() / legend_scale);
     if (graph_title.length())
     {
         cr->set_source_rgba(axes_colour.get_red(), axes_colour.get_green(), axes_colour.get_blue(), axes_colour.get_alpha());

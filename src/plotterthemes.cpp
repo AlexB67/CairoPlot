@@ -5,7 +5,7 @@ const Glib::ustring& CairoGraph::get_theme_name() const
      return current_theme;
 }
 
-void CairoGraph::set_theme(const Glib::ustring& theme)
+void CairoGraph::set_theme(const Glib::ustring& theme, bool automatic)
 {
     if ( "Fade to black" == theme)
     {
@@ -58,12 +58,13 @@ void CairoGraph::set_theme(const Glib::ustring& theme)
     }
     else
     {
-        current_theme = "Fade to black";
+        current_theme = "Black";
         axes_colour.set_rgba(1.0, 1.0, 1.0, 0.80);
         bg_colour1.set_rgba(0.0, 0.0, 0.0, 1.0);
-        bg_colour2.set_rgba(0.28, 0.28, 0.28, 1.0);
+        bg_colour2.set_rgba(0.0, 0.0, 0.0, 1.0);
     }
 
+    if (false == automatic) return;
 
     if ("Adwaita" == current_theme)
     {

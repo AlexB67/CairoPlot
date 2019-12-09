@@ -12,7 +12,7 @@
 namespace CarioGraphConstants
 {
     constexpr double BOX_LINEWIDTH = 1.5;
-    constexpr double GRID_LINEWIDTH = 0.0005;
+    constexpr double GRID_LINEWIDTH = 0.0005; // in scaled coordinates
     constexpr double OFFSET_X = 0.1950;
     constexpr double OFFSET_Y = 0.1000;
     constexpr double GRAPH_WIDTH = 0.700;
@@ -79,7 +79,7 @@ public:
     void update_graph();
     void set_background_style(const Gdk::RGBA colour1, const Gdk::RGBA colour2);
     void set_background_style(const Gdk::RGBA colour1);
-    void set_axes_labels(const Glib::ustring &xlabel, const Glib::ustring &ylabel, Glib::ustring fontfamily = _("Latin Modern Roman"));
+    void set_axes_labels(const Glib::ustring &xlabel, const Glib::ustring &ylabel, Glib::ustring fontfamily = _("Nimbus Roman"));
     void set_tick_label_format_x(const bool showpointx, const int precision);
     void set_tick_label_format_y(const bool showpointy, const int precision);
     void add_multi_series(const std::vector<std::vector<double>> &xvalues, const std::vector<std::vector<double>> &yvalues);
@@ -90,6 +90,7 @@ public:
     void add_multi_legends(const std::vector<Glib::ustring> &legends, const double offsetx = 0.0, const double offsety = 0.0);
     void add_single_legend(const Glib::ustring &legend, CairoGraphPos pos, const bool showlinecolour);
     void show_legend(const bool show);
+    void set_legend_scale(const double scale);
     void add_text(/*const Glib::ustring& text, const double x, const double y */); // todo
     const Glib::ustring &get_theme_name() const;
     void force_scientific_notation(const bool scientificx, const bool scientificy);
@@ -100,7 +101,8 @@ public:
     void add_line_styles(const std::vector<CairoGraphLineStyle> &style);
     void set_graph_box_style(const CairoGraphBoxStyle style);
     void set_title(const Glib::ustring &title);
-    void set_theme(const Glib::ustring &theme);
+    void set_theme(const Glib::ustring &theme, bool automatic = false);
+    void add_text_objects(const std::vector<std::tuple<Glib::ustring, double, double, double, bool> >& text);
 
 private:
     double xmax;
@@ -113,16 +115,19 @@ private:
     double end_y;
     double legend_offsetx = 0.0;
     double legend_offsety = 0.0;
+    double legend_scale = 1.0;
     bool selection_mode = false;
     bool draw_zoom = false;
+    bool been_once = false;
     bool forcescientificx = false;
     bool forcescientificy = false;
     bool legend_show_colour = true;
     bool showlegend = true;
-    unsigned int precisionx = 0;
-    unsigned int precisiony = 0;
     bool showpointx = false;
     bool showpointy = false;
+    unsigned int precisionx = 0;
+    unsigned int precisiony = 0;
+    
 
     struct graph_params
     {
@@ -140,7 +145,6 @@ private:
     };
 
     graph_params plot;
-    std::vector<graph_params> zstack; // TO DO, right now we have one zoom level;
     Glib::ustring xmarkuplabel;
     Glib::ustring ymarkuplabel;
     Glib::ustring graph_title;
@@ -167,6 +171,8 @@ private:
     std::vector<double> m_yvalues;
     std::vector<std::vector<double>> seriesx;
     std::vector<std::vector<double>> seriesy;
+    std::vector<std::tuple<Glib::ustring, double, double, double, bool> > text_objects;
+    Cairo::RefPtr<Cairo::ImageSurface> canvas;
 
     void create_tickmark_labels(const Cairo::RefPtr<Cairo::Context> &cr);
     void create_labels(const Cairo::RefPtr<Cairo::Context> &cr);

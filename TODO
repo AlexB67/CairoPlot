@@ -1,0 +1,3 @@
+- More than one zoom level, currently only one
+- Add more options so add_series can be callled to create a mutli series insted of using multi_series
+- documentation
