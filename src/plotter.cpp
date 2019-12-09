@@ -191,6 +191,7 @@ bool CairoGraph::on_draw(const Cairo::RefPtr<Cairo::Context> &cr)
             cr->set_source_rgba(0.80, 0.80, 0.80, 0.35);
         else
             cr->set_source_rgba(0.0, 1.0, 1.0, 0.25);
+
         cr->set_line_width(0.0005);
         cr->rectangle(start_x, start_y, end_x - start_x, end_y - start_y);
         cr->fill();

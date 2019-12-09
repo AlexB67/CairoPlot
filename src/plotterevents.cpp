@@ -86,7 +86,7 @@ bool CairoGraph::on_motion_notify_event(GdkEventMotion *event)
     if (plot.zoom_count > 1) return true; // to do allow for more zoom levels, for now disable if greater than one level
 
     if (scaled_x > OFFSET_X && scaled_x < OFFSET_X + GRAPH_WIDTH &&
-        scaled_y > OFFSET_Y && scaled_y < OFFSET_Y + GRAPH_HEIGHT)
+        scaled_y > OFFSET_Y && scaled_y < OFFSET_Y + GRAPH_HEIGHT && true == selection_mode)
     {
         end_x = scaled_x;
         end_y = scaled_y;
