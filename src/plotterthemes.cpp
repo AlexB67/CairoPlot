@@ -1,4 +1,5 @@
 #include "plotter.hpp"
+#include <iostream>
 
 const Glib::ustring& CairoGraph::get_theme_name() const 
 {
@@ -42,19 +43,20 @@ void CairoGraph::set_theme(const Glib::ustring& theme, bool automatic)
      	bg_colour1.set_rgba(19.0 / 255.0, 19.0 / 255.0, 25.0 / 255.0, 1.0);
 		bg_colour2.set_rgba(46.0 / 255.0, 48.0 / 255.0, 58.0 / 255.0, 1.0);
     }
-    else if ("Adwaita-dark" ==  theme)
+    else if ("Default" ==  theme)
     {
-        current_theme = theme;
-        axes_colour.set_rgba(1.0, 1.0, 1.0, 0.80);
-     	bg_colour1.set_rgba(48.0 / 255.0, 48.0 / 255.0, 48.0 / 255.0, 1.0);
-		bg_colour2.set_rgba(48.0 / 255.0, 48.0 / 255.0, 48.0 / 255.0, 1.0);
-    }
-    else if ("Adwaita" ==  theme)
-    {
-        current_theme = theme;
-        axes_colour.set_rgba(0.0, 0.0, 0.0, 0.75);
-     	bg_colour1.set("white");
-		bg_colour2.set("white");
+        // get the colours from the system theme
+        current_theme = "Default";
+        auto context = xvalue->get_style_context();
+        axes_colour.set(context->get_color().to_string());
+     	bg_colour1.set(context->get_background_color().to_string());
+		bg_colour2.set(context->get_background_color().to_string());
+
+        // doesn't look good with many themes so reserve this for adwaita
+        if( Gtk::Settings::get_default()->property_gtk_theme_name().get_value() == "Adwaita" || 
+            Gtk::Settings::get_default()->property_gtk_theme_name().get_value() == "Adwaita-dark")
+            border_colour = context->get_border_color();
+        else border_colour.set_rgba(0.0, 0.0, 0.0, 0.33);
     }
     else
     {
@@ -64,28 +66,31 @@ void CairoGraph::set_theme(const Glib::ustring& theme, bool automatic)
         bg_colour2.set_rgba(0.0, 0.0, 0.0, 1.0);
     }
 
+
     if (false == automatic) return;
 
-    if ("Adwaita" == current_theme)
+    // automatic line colouring if requested
+
+    if (axes_colour.get_red() < 0.25 && axes_colour.get_green() < 0.25 && axes_colour.get_blue() < 0.25)
     {
-        for(size_t i = 0; i < seriesy.size(); ++i)
+        for (size_t i = seriescolour.size(); i < seriesy.size(); ++i)
         {
-                Gdk::RGBA colour;
-                colour.set_rgba(0.0, 
-                                0.5 * static_cast<double>(seriesy.size() - i) / seriesy.size(), 
-                                0.5 * static_cast<double>(seriesy.size() - i) / seriesy.size(), 1.0);
-                seriescolour[i] = colour;
+            Gdk::RGBA colour;
+            colour.set_rgba(0.0,
+                            0.5 * static_cast<double>(seriesy.size() - i) / seriesy.size(),
+                            0.5 * static_cast<double>(seriesy.size() - i) / seriesy.size(), 1.0);
+            seriescolour.emplace_back(colour);
         }
     }
     else
     {
-        for(size_t i = 0; i < seriesy.size(); ++i)
+        for (size_t i = seriescolour.size(); i < seriesy.size(); ++i)
         {
             Gdk::RGBA colour;
-            colour.set_rgba(1.0 * static_cast<double>(i + 1) / seriesy.size(), 
-                            0.5 + 0.5 * static_cast<double>(i + 1) / seriesy.size(), 
+            colour.set_rgba(1.0 * static_cast<double>(i + 1) / seriesy.size(),
+                            0.5 + 0.5 * static_cast<double>(i + 1) / seriesy.size(),
                             0.5 + 0.5 * static_cast<double>(i + 1) / seriesy.size(), 1.0);
-            seriescolour[i] = colour;
+            seriescolour.emplace_back(colour);
         }
     }
 }

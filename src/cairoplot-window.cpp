@@ -25,8 +25,9 @@ CairoplotWindow::CairoplotWindow(const Glib::RefPtr<Gtk::Application>& app)
 	: Glib::ObjectBase("CairoplotWindow")
 	, Gtk::ApplicationWindow()
 	, m_app(app)
-{
+{	
 	Gtk::Settings::get_default()->property_gtk_application_prefer_dark_theme().set_value(true);
+
 	create_header_and_menus();
 
 	graphframe.set_label(_("Graph"));
@@ -143,9 +144,9 @@ CairoplotWindow::CairoplotWindow(const Glib::RefPtr<Gtk::Application>& app)
 	selecttheme->insert(1, _("Black"));
 	selecttheme->insert(2, _("Midnight blue"));
 	selecttheme->insert(3, _("Herculean blue"));
-	selecttheme->insert(4, _("Adwaita-dark"));
-	selecttheme->insert(5, _("Adwaita"));
-	selecttheme->insert(6, _("Dark"));
+	selecttheme->insert(4, _("Dark"));
+	selecttheme->insert(5, _("Desktop theme"));
+	selecttheme->set_tooltip_text("Determines the graph colours. The default uses desktop theme colours.");
 
 	sizegroup = Gtk::SizeGroup::create(Gtk::SIZE_GROUP_HORIZONTAL);
 	sizegroup->add_widget(*selectgraph);
@@ -188,23 +189,21 @@ CairoplotWindow::CairoplotWindow(const Glib::RefPtr<Gtk::Application>& app)
 				graph->set_theme("Herculean blue");
 				break;
 			case 4:
-				graph->set_theme("Adwaita-dark");
-				break;
-			case 5:
-				graph->set_theme("Adwaita");
-				col.set_rgba(18.0 / 255.0, 83.0 / 255.0, 158.0 / 255.0, 1.0);
-				linecolour->set_rgba(col);
-				break;
-			case 6:
 				graph->set_theme("Dark");
 				break;
+			case 5:
+				graph->set_theme("Default");
+				break;
+			
 			default:
 				break;
 		}
 
-		graph->set_line_colour(0, col);
+		if (single_series == true) graph->set_line_colour(0, col);
+		
 		graph->update_graph();
 	});
+	
 
 	// create a graph and connect signals
 

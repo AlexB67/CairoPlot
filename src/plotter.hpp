@@ -101,7 +101,7 @@ public:
     void add_line_styles(const std::vector<CairoGraphLineStyle> &style);
     void set_graph_box_style(const CairoGraphBoxStyle style);
     void set_title(const Glib::ustring &title);
-    void set_theme(const Glib::ustring &theme, bool automatic = false);
+    void set_theme(const Glib::ustring &theme, bool automatic = true);
     void add_text_objects(const std::vector<std::tuple<Glib::ustring, double, double, double, bool> >& text);
 
 private:
@@ -118,7 +118,6 @@ private:
     double legend_scale = 1.0;
     bool selection_mode = false;
     bool draw_zoom = false;
-    bool been_once = false;
     bool forcescientificx = false;
     bool forcescientificy = false;
     bool legend_show_colour = true;
@@ -165,6 +164,7 @@ private:
     Gdk::RGBA bg_colour1;
     Gdk::RGBA bg_colour2;
     Gdk::RGBA axes_colour;
+    Gdk::RGBA border_colour;
     Cairo::RefPtr<Cairo::LinearGradient> gradient;
     Glib::RefPtr<Gdk::Cursor> cross_hair_cursor;
     std::vector<double> m_xvalues;
@@ -187,7 +187,6 @@ private:
     bool on_button_press_event(GdkEventButton *event) override;
     bool on_button_release_event(GdkEventButton *event) override;
     bool on_motion_notify_event(GdkEventMotion *event) override;
-    // bool on_leave_notify_event(GdkEventCrossing *event) override;
 
 protected:
     virtual void get_preferred_width_vfunc(int &minimum_width, int &natural_width) const override;

@@ -1,7 +1,6 @@
 #include "plotter.hpp"
 #include <iomanip>
 #include <iostream>
-#include <gtkmm/cssprovider.h>
 
 using namespace CarioGraphConstants;
 
@@ -49,11 +48,11 @@ bool CairoGraph::on_draw(const Cairo::RefPtr<Cairo::Context> &cr)
 
     if (selection_mode == false)
     {
-        // we create a durface to write on and restore it when zooming
+        // we create a surface to write on and restore it when zooming
         // instead of redrawing eveything
         cr->save();
         cr->scale(1.0 / w, 1.0 / h);
-        canvas = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, w, h);
+        canvas = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, w, h); 
         auto context = Cairo::Context::create(canvas);
         cr->restore();
 
@@ -153,19 +152,11 @@ bool CairoGraph::on_draw(const Cairo::RefPtr<Cairo::Context> &cr)
         create_tickmark_labels(cr);
         create_labels(cr);
 
-        // Draw a line around the graph box if Adwaita
-        if ("Adwaita-dark" == current_theme)
+        // draw a border for system themes
+        if ("Default" == current_theme)
         {
-            cr->set_source_rgba(0.0, 0.0, 0.0, 0.50);
-            cr->set_line_width(0.0020);
-            cr->rectangle(0.0, 0.0, 1.0, 1.0);
-            cr->stroke();
-        }
-
-        if ("Adwaita" == current_theme)
-        {
-            cr->set_source_rgba(0.1, 0.1, 0.1, 0.35);
-            cr->set_line_width(0.0020);
+            cr->set_source_rgba(border_colour.get_red(), border_colour.get_green(), border_colour.get_blue(), border_colour.get_alpha());
+            cr->set_line_width(0.0030);
             cr->rectangle(0.0, 0.0, 1.0, 1.0);
             cr->stroke();
         }
