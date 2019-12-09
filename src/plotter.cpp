@@ -281,8 +281,8 @@ void CairoGraph::draw_single_series(const Cairo::RefPtr<Cairo::Context> &cr)
     cr->rectangle(OFFSET_X, OFFSET_Y, GRAPH_WIDTH, GRAPH_HEIGHT); 
     cr->clip();
 
-    if (true == draw_zoom) // to do allow for more zoom levels, currently one
-    {   
+   if (true == draw_zoom) // to do allow for more zoom levels currently one
+    {
         if (plot.zoom_start_x > plot.zoom_end_x) std::swap(plot.zoom_start_x, plot.zoom_end_x);
         if (plot.zoom_start_y > plot.zoom_end_y) std::swap(plot.zoom_start_y, plot.zoom_end_y);
         
@@ -292,6 +292,7 @@ void CairoGraph::draw_single_series(const Cairo::RefPtr<Cairo::Context> &cr)
         plot.xmax = xmin + (plot.zoom_end_x - OFFSET_X) * (xmax - xmin) / GRAPH_WIDTH;
         plot.ymin = ymin + (GRAPH_HEIGHT + OFFSET_Y - plot.zoom_end_y) * (ymax - ymin) / GRAPH_HEIGHT;
         plot.ymax = ymin + (GRAPH_HEIGHT + OFFSET_Y - plot.zoom_start_y) * (ymax - ymin) / GRAPH_HEIGHT;
+        plot.zoom_count++;
     }
     else
     {

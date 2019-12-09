@@ -29,7 +29,7 @@ bool CairoGraph::on_button_release_event(GdkEventButton *event)
 {
     // to do, allow for more zoom levels, for now disable if greater than one level
 
-    if (event->type == GDK_BUTTON_RELEASE && event->button == 1)  
+    if (event->type == GDK_BUTTON_RELEASE && event->button == 1 && plot.zoom_count < 1)  
     {
         selection_mode = false; 
         plot.zoom_factor_x = fabs(end_x - start_x) / GRAPH_WIDTH;
