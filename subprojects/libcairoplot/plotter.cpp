@@ -52,10 +52,10 @@ bool CairoGraph::on_draw(const Cairo::RefPtr<Cairo::Context> &cr)
         // instead of redrawing eveything
         cr->save();
         cr->scale(1.0 / w, 1.0 / h);
-        canvas = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, w, h); 
+        canvas.clear(); // needed ?
+        canvas = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, w, h);
         auto context = Cairo::Context::create(canvas);
         cr->restore();
-
         gradient = Cairo::LinearGradient::create(0.0, 0.0, 0.0, 1.0);
 
         // Set grandient colors

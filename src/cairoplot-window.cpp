@@ -416,7 +416,6 @@ void CairoplotWindow::make_plot()
 
 	graph->set_tick_label_format_x(false, 2);
 	graph->set_tick_label_format_y(true, 0);
-
 	graph->set_axes_labels(_("<i>t</i> / s"), _("<i>s</i> / m"));
 
 	if ( true == single_series ) 
@@ -428,14 +427,10 @@ void CairoplotWindow::make_plot()
 	}
 	else 
 	{
-		Glib::ustring legend = "<i>s</i> = <i>v</i><sub>o</sub> + 0.5(" + Glib::ustring::format(accel) + ")<i>t</i><sup>2</sup>";
-		Glib::ustring legend1 = "<i>s</i> = <i>v</i><sub>o</sub> + 0.5(3.71)<i>t</i><sup>2</sup>";
-		Glib::ustring legend2 = "<i>s</i> = <i>v</i><sub>o</sub> + 0.5(5.55)<i>t</i><sup>2</sup>";
-
-		std::vector<Glib::ustring> legends;
-		legends.emplace_back(legend);
-		legends.emplace_back(legend1);
-		legends.emplace_back(legend2);
+		std::vector<Glib::ustring> legends(numplots);
+		legends[0] = "<i>s</i> = <i>v</i><sub>o</sub> + 0.5(" + Glib::ustring::format(accel) + ")<i>t</i><sup>2</sup>";
+		legends[1] = "<i>s</i> = <i>v</i><sub>o</sub> + 0.5(3.71)<i>t</i><sup>2</sup>";
+		legends[2] = "<i>s</i> = <i>v</i><sub>o</sub> + 0.5(5.55)<i>t</i><sup>2</sup>";
 
 		graph->add_multi_series(xseries, yseries);
 		

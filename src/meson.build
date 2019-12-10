@@ -1,15 +1,9 @@
 cairoplot_sources = [
   'main.cpp',
   'cairoplot-window.cpp',
-  'plotter.cpp',
-  'plotterlabels.cpp',
-  'plotteroptions.cpp',
-  'plotterthemes.cpp',
-  'plotterwidgets.cpp',
-  'plotterevents.cpp'
 ]
 
-cairoplot_deps = [
+cairoplot_gtkmmdeps = [
   dependency('gtkmm-3.0', version: '>= 3.18'),
 ]
 
@@ -21,7 +15,7 @@ cairoplot_sources += gnome.compile_resources('cairoplot-resources',
 )
 
 executable('cairoplot', cairoplot_sources,
-  dependencies: cairoplot_deps,
+  dependencies: [cairoplot_gtkmmdeps, libcairoplot_dep],
   override_options : ['cpp_std=c++17'],
   cpp_args : '-Wl, -Wall, -Wextra -Wshadow',
   install: true,

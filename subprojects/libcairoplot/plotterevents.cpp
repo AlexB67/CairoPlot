@@ -16,6 +16,8 @@ bool CairoGraph::on_button_press_event(GdkEventButton *event)
         {
             start_x = scaled_x;
             start_y = scaled_y;
+            end_x = start_x; // prevents drawing rogue selection box on first click
+            end_y = start_y;
             plot.zoom_start_x = start_x;
             plot.zoom_start_y = start_y;
             selection_mode = true;
@@ -41,20 +43,18 @@ bool CairoGraph::on_button_release_event(GdkEventButton *event)
         draw_zoom = true;
         plot.zoom_end_x = end_x;
         plot.zoom_end_y = end_y;
-        
-        queue_draw_area(0, 0,  get_allocation().get_width(), get_allocation().get_height());
     }
-    
-    if (event->type == GDK_BUTTON_RELEASE && event->button == 3)
+    else if (event->type == GDK_BUTTON_RELEASE && event->button == 3)
     {
         plot.zoom_factor_x = 1.0;
         plot.zoom_factor_y = 1.0;
         plot.zoom_count = 0;
         draw_zoom = false;
         selection_mode = false;
-        queue_draw_area(0, 0,  get_allocation().get_width(), get_allocation().get_height());
     }
 
+    queue_draw_area(0, 0,  get_allocation().get_width(), get_allocation().get_height());
+    
     return true;
 }
 
@@ -64,7 +64,7 @@ bool CairoGraph::on_motion_notify_event(GdkEventMotion *event)
     Gtk::Allocation allocation = get_allocation();
     auto scaled_x = event->x / allocation.get_width();
     auto scaled_y = event->y / allocation.get_height();
-
+    
     if (scaled_x < OFFSET_X || scaled_x > OFFSET_X + GRAPH_WIDTH ||
         scaled_y < OFFSET_Y || scaled_y > OFFSET_Y + GRAPH_HEIGHT)
     {
