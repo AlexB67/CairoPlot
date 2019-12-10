@@ -140,7 +140,7 @@ private:
         double zoom_end_x;
         double zoom_start_y;
         double zoom_end_y;
-        size_t zoom_count = 0;
+        bool zoomed = false;
     };
 
     graph_params plot;
@@ -187,6 +187,7 @@ private:
     bool on_button_press_event(GdkEventButton *event) override;
     bool on_button_release_event(GdkEventButton *event) override;
     bool on_motion_notify_event(GdkEventMotion *event) override;
+   // bool on_leave_notify_event(GdkEventCrossing *event) override;
 
 protected:
     virtual void get_preferred_width_vfunc(int &minimum_width, int &natural_width) const override;

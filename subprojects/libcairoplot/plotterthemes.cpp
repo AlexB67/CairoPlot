@@ -72,7 +72,7 @@ void CairoGraph::set_theme(const Glib::ustring& theme, bool automatic)
     // automatic line colouring if requested
 
     if (axes_colour.get_red() < 0.25 && axes_colour.get_green() < 0.25 && axes_colour.get_blue() < 0.25)
-    {
+    {   // prabably a light theme
         for (size_t i = seriescolour.size(); i < seriesy.size(); ++i)
         {
             Gdk::RGBA colour;

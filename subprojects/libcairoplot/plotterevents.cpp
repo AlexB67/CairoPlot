@@ -8,7 +8,7 @@ bool CairoGraph::on_button_press_event(GdkEventButton *event)
     Gtk::Allocation allocation = get_allocation();
     auto scaled_x =  event->x / allocation.get_width();
     auto scaled_y =  event->y / allocation.get_height();
-    
+
     if (event->type == GDK_BUTTON_PRESS && event->button == 1)
     {
         if (scaled_x > OFFSET_X && scaled_x < OFFSET_X + GRAPH_WIDTH &&
@@ -31,14 +31,14 @@ bool CairoGraph::on_button_release_event(GdkEventButton *event)
 {
     // to do, allow for more zoom levels, for now disable if greater than one level
 
-    if (event->type == GDK_BUTTON_RELEASE && event->button == 1 && plot.zoom_count < 1)  
+    if (event->type == GDK_BUTTON_RELEASE && event->button == 1 && false == plot.zoomed)  
     {
-        selection_mode = false; 
         plot.zoom_factor_x = fabs(end_x - start_x) / GRAPH_WIDTH;
-        plot.zoom_factor_y = fabs(end_y - start_y) / GRAPH_HEIGHT;
+        plot.zoom_factor_y = fabs(end_y - start_y) / GRAPH_HEIGHT; 
+        selection_mode = false; 
         
-        if (plot.zoom_factor_x < 0.0001) plot.zoom_factor_x = 0.0001;
-        if (plot.zoom_factor_y < 0.0001) plot.zoom_factor_y = 0.0001;
+        // save guard the user double click and too small a region selected
+        if (plot.zoom_factor_x < 0.001 || plot.zoom_factor_x < 0.001) return true;
 
         draw_zoom = true;
         plot.zoom_end_x = end_x;
@@ -48,7 +48,7 @@ bool CairoGraph::on_button_release_event(GdkEventButton *event)
     {
         plot.zoom_factor_x = 1.0;
         plot.zoom_factor_y = 1.0;
-        plot.zoom_count = 0;
+        plot.zoomed = false;
         draw_zoom = false;
         selection_mode = false;
     }
@@ -83,7 +83,7 @@ bool CairoGraph::on_motion_notify_event(GdkEventMotion *event)
         get_window()->set_cursor(cross_hair_cursor);
     }
 
-    if (plot.zoom_count > 1) return true; // to do allow for more zoom levels, for now disable if greater than one level
+    if (plot.zoomed == true) return true; // to do allow for more zoom levels, for now disable if greater than one level
 
     if (scaled_x > OFFSET_X && scaled_x < OFFSET_X + GRAPH_WIDTH &&
         scaled_y > OFFSET_Y && scaled_y < OFFSET_Y + GRAPH_HEIGHT && true == selection_mode)

@@ -13,7 +13,7 @@ CairoGraph::CairoGraph()
     xvaluelabel = Gtk::make_managed<Gtk::Label>();
     yvaluelabel = Gtk::make_managed<Gtk::Label>();
 
-    add_events(Gdk::POINTER_MOTION_MASK | Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK);
+    add_events( Gdk::POINTER_MOTION_MASK | Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK);
 
     auto display = Gdk::Display::get_default();
     cross_hair_cursor = Gdk::Cursor::create(display, Gdk::CROSSHAIR); // graph cursor
@@ -212,12 +212,10 @@ void CairoGraph::draw_multi_series(const Cairo::RefPtr<Cairo::Context> &cr)
         plot.xmax = xmin + (plot.zoom_end_x - OFFSET_X) * (xmax - xmin) / GRAPH_WIDTH;
         plot.ymin = ymin + (GRAPH_HEIGHT + OFFSET_Y - plot.zoom_end_y) * (ymax - ymin) / GRAPH_HEIGHT;
         plot.ymax = ymin + (GRAPH_HEIGHT + OFFSET_Y - plot.zoom_start_y) * (ymax - ymin) / GRAPH_HEIGHT;
-        plot.zoom_count++;
+        plot.zoomed = true;
     }
     else
     {
-        plot.zoom_factor_x = 1.0;
-        plot.zoom_factor_x = 1.0;
         plot.xmin = xmin;
         plot.xmax = xmax;
         plot.ymin = ymin;
@@ -284,7 +282,7 @@ void CairoGraph::draw_single_series(const Cairo::RefPtr<Cairo::Context> &cr)
         plot.xmax = xmin + (plot.zoom_end_x - OFFSET_X) * (xmax - xmin) / GRAPH_WIDTH;
         plot.ymin = ymin + (GRAPH_HEIGHT + OFFSET_Y - plot.zoom_end_y) * (ymax - ymin) / GRAPH_HEIGHT;
         plot.ymax = ymin + (GRAPH_HEIGHT + OFFSET_Y - plot.zoom_start_y) * (ymax - ymin) / GRAPH_HEIGHT;
-        plot.zoom_count++;
+        plot.zoomed = true;
     }
     else
     {
@@ -461,7 +459,7 @@ void CairoGraph::clear_graph()
     text_objects.clear();
     plot.zoom_factor_x = 1.0;
     plot.zoom_factor_y = 1.0;
-    plot.zoom_count = 0;
+    plot.zoomed = false;
     legend_offsetx = 0.0;
     legend_offsety = 0.0;
     legend_scale = 1.0;

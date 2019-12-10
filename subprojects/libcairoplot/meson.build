@@ -12,7 +12,7 @@ gtkmmdeps = [
 ]
 
 inc = include_directories('.')
-libcairoplot = shared_library('cairoplot',
+libcairoplot = static_library('cairoplot',
     'plotter.cpp',
     'plotterlabels.cpp',
     'plotteroptions.cpp',
