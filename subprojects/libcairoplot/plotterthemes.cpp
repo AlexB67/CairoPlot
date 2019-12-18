@@ -1,12 +1,12 @@
 #include "plotter.hpp"
 #include <iostream>
 
-const Glib::ustring& CairoGraph::get_theme_name() const 
+const Glib::ustring& CGraph::CairoGraph::get_theme_name() const 
 {
      return current_theme;
 }
 
-void CairoGraph::set_theme(const Glib::ustring& theme, bool automatic)
+void CGraph::CairoGraph::set_theme(const Glib::ustring& theme, bool automatic)
 {
     if ( "Fade to black" == theme)
     {

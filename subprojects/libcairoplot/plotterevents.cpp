@@ -3,7 +3,7 @@
 
 using namespace CarioGraphConstants;
 
-bool CairoGraph::on_button_press_event(GdkEventButton *event)
+bool CGraph::CairoGraph::on_button_press_event(GdkEventButton *event)
 {
     Gtk::Allocation allocation = get_allocation();
     auto scaled_x =  event->x / allocation.get_width();
@@ -27,7 +27,7 @@ bool CairoGraph::on_button_press_event(GdkEventButton *event)
     return true;
 }
 
-bool CairoGraph::on_button_release_event(GdkEventButton *event)
+bool CGraph::CairoGraph::on_button_release_event(GdkEventButton *event)
 {
     // to do, allow for more zoom levels, for now disable if greater than one level
 
@@ -58,7 +58,7 @@ bool CairoGraph::on_button_release_event(GdkEventButton *event)
     return true;
 }
 
-bool CairoGraph::on_motion_notify_event(GdkEventMotion *event)
+bool CGraph::CairoGraph::on_motion_notify_event(GdkEventMotion *event)
 {
 
     Gtk::Allocation allocation = get_allocation();

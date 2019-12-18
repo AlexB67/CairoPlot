@@ -4,7 +4,7 @@
 
 using namespace CarioGraphConstants;
 
-CairoGraph::CairoGraph()
+CGraph::CairoGraph::CairoGraph()
 {   
     grid    = Gtk::make_managed<Gtk::Grid>();
     cursor_grid = Gtk::make_managed<Gtk::Grid>();
@@ -27,13 +27,13 @@ CairoGraph::CairoGraph()
     set_size_request(start_height, start_height);
 }
 
-void CairoGraph::set_title(const Glib::ustring& title)
+void CGraph::CairoGraph::set_title(const Glib::ustring& title)
 {
     graph_title.clear();
     graph_title = title;
 }
 
-bool CairoGraph::on_draw(const Cairo::RefPtr<Cairo::Context> &cr)
+bool CGraph::CairoGraph::on_draw(const Cairo::RefPtr<Cairo::Context> &cr)
 {
     Gtk::Allocation allocation = get_allocation();
     const int w = allocation.get_width();
@@ -191,7 +191,7 @@ bool CairoGraph::on_draw(const Cairo::RefPtr<Cairo::Context> &cr)
     return true;
 }
 
-void CairoGraph::draw_multi_series(const Cairo::RefPtr<Cairo::Context> &cr)
+void CGraph::CairoGraph::draw_multi_series(const Cairo::RefPtr<Cairo::Context> &cr)
 {
     if(!seriesy.size() || !seriesy.size()) return;
 
@@ -262,7 +262,7 @@ void CairoGraph::draw_multi_series(const Cairo::RefPtr<Cairo::Context> &cr)
     cr->restore();
 }
 
-void CairoGraph::draw_single_series(const Cairo::RefPtr<Cairo::Context> &cr)
+void CGraph::CairoGraph::draw_single_series(const Cairo::RefPtr<Cairo::Context> &cr)
 {
     if(m_xvalues.size() < 2 || m_yvalues.size() < 2) return;
 
@@ -327,7 +327,7 @@ void CairoGraph::draw_single_series(const Cairo::RefPtr<Cairo::Context> &cr)
     cr->restore();
 }
 
-void CairoGraph::add_multi_series(const std::vector<std::vector<double>> &xvalues, const std::vector<std::vector<double>> &yvalues)
+void CGraph::CairoGraph::add_multi_series(const std::vector<std::vector<double>> &xvalues, const std::vector<std::vector<double>> &yvalues)
 {
     // map data to graph coordinates, setup plot data
 
@@ -398,7 +398,7 @@ void CairoGraph::add_multi_series(const std::vector<std::vector<double>> &xvalue
         for (size_t i = serieslinestyle.size(); i < seriesy.size(); ++i) serieslinestyle.emplace_back(CairoGraphLineStyle::SOLID_LINE);
 }
 
-void CairoGraph::add_series(const std::vector<double> &xvalues, const std::vector<double> &yvalues,
+void CGraph::CairoGraph::add_series(const std::vector<double> &xvalues, const std::vector<double> &yvalues,
                             const Gdk::RGBA linecolour, const CairoGraphLineStyle style)
 {
     // map data to graph coordinates, setup plot data
@@ -445,7 +445,7 @@ void CairoGraph::add_series(const std::vector<double> &xvalues, const std::vecto
     serieslinestyle.emplace_back(style);
 }
 
-void CairoGraph::clear_graph()
+void CGraph::CairoGraph::clear_graph()
 {
     seriescolour.clear();
     serieslinestyle.clear();
@@ -468,30 +468,30 @@ void CairoGraph::clear_graph()
 
 }
 
-void CairoGraph::update_graph()
+void CGraph::CairoGraph::update_graph()
 {
      queue_draw_area(0, 0, get_allocation().get_width(), get_allocation().get_height());
 }
 
-void CairoGraph::get_preferred_width_vfunc(int &minimum_width, int &natural_width) const
+void CGraph::CairoGraph::get_preferred_width_vfunc(int &minimum_width, int &natural_width) const
 {
     minimum_width = 256;
     natural_width = 580;
 }
 
-void CairoGraph::get_preferred_height_vfunc(int &minimum_height, int &natural_height) const
+void CGraph::CairoGraph::get_preferred_height_vfunc(int &minimum_height, int &natural_height) const
 {
     minimum_height = 256;
     natural_height = 512;
 }
 
-void CairoGraph::get_preferred_width_for_height_vfunc(int, int &minimum_width, int &natural_width) const
+void CGraph::CairoGraph::get_preferred_width_for_height_vfunc(int, int &minimum_width, int &natural_width) const
 {
     minimum_width = 256;
     natural_width = 580;
 }
 
-void CairoGraph::get_preferred_height_for_width_vfunc(int, int &minimum_height, int &natural_height) const
+void CGraph::CairoGraph::get_preferred_height_for_width_vfunc(int, int &minimum_height, int &natural_height) const
 {
     minimum_height = 256;
     natural_height = 512;

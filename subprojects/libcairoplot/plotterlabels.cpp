@@ -4,7 +4,7 @@
 
 using namespace CarioGraphConstants;
 
-void CairoGraph::create_tickmark_labels(const Cairo::RefPtr<Cairo::Context> &cr)
+void CGraph::CairoGraph::create_tickmark_labels(const Cairo::RefPtr<Cairo::Context> &cr)
 {
     constexpr int numlabels = 5;
     std::array<Glib::ustring, numlabels> labely, labelx;
@@ -233,7 +233,7 @@ void CairoGraph::create_tickmark_labels(const Cairo::RefPtr<Cairo::Context> &cr)
     }
 }
 
-void CairoGraph::create_labels(const Cairo::RefPtr<Cairo::Context> &cr)
+void CGraph::CairoGraph::create_labels(const Cairo::RefPtr<Cairo::Context> &cr)
 {
     double xpos;
     double ypos;
@@ -398,7 +398,7 @@ void CairoGraph::create_labels(const Cairo::RefPtr<Cairo::Context> &cr)
     }
 }
 
-void CairoGraph::set_font_scale(const double scale, Pango::FontDescription *font, const int h, const int w) const
+void CGraph::CairoGraph::set_font_scale(const double scale, Pango::FontDescription *font, const int h, const int w) const
 {
     if (w > 768 && h > 768)
         font->set_size(static_cast<int>(scale * 21 * PANGO_SCALE));

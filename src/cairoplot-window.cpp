@@ -34,7 +34,7 @@ CairoplotWindow::CairoplotWindow(const Glib::RefPtr<Gtk::Application>& app)
 	graphframe.set_label_align(Gtk::ALIGN_CENTER, Gtk::ALIGN_CENTER);
 	graphframe.set_hexpand(true);
 
-	graph = Gtk::make_managed<CairoGraph>();
+	graph = Gtk::make_managed<CGraph::CairoGraph>();
 	selectgraph = Gtk::make_managed<Gtk::ComboBoxText>();
 	selectgraph->set_margin_top(10);
 	selecttheme = Gtk::make_managed<Gtk::ComboBoxText>();

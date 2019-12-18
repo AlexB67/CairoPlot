@@ -46,7 +46,7 @@ private:
 	Gtk::HeaderBar headerbar;
 	Glib::RefPtr<Gio::Menu> winmenu;
 	Gtk::MenuButton menubutton;
-	CairoGraph *graph;
+	CGraph::CairoGraph *graph;
 	Gtk::Frame graphframe;
 	Gtk::Frame graphcontrolframe;
 	Gtk::Grid  maingrid;
