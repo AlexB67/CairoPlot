@@ -18,8 +18,14 @@ bool CGraph::CairoGraph::on_button_press_event(GdkEventButton *event)
             start_y = scaled_y;
             end_x = start_x; // prevents drawing rogue selection box on first click
             end_y = start_y;
-            plot.zoom_start_x = start_x;
-            plot.zoom_start_y = start_y;
+
+            // selection start point in zoomed frame
+            double sx = plot.xmin + (start_x - OFFSET_X) * (plot.xmax - plot.xmin) / GRAPH_WIDTH;
+            double sy = plot.ymax - (start_y - OFFSET_Y) * (plot.ymax - plot.ymin) / GRAPH_HEIGHT;
+
+            // selection start point in unzoomed frame, we always zoom wrt unzoomed frame coordinates.
+            plot.zoom_start_x = OFFSET_X + (sx - xmin)  / (xmax - xmin) * GRAPH_WIDTH;
+            plot.zoom_start_y = OFFSET_Y + (ymax - sy)  / (ymax - ymin) * GRAPH_HEIGHT;
             selection_mode = true;
         }
     }
@@ -29,20 +35,24 @@ bool CGraph::CairoGraph::on_button_press_event(GdkEventButton *event)
 
 bool CGraph::CairoGraph::on_button_release_event(GdkEventButton *event)
 {
-    // to do, allow for more zoom levels, for now disable if greater than one level
-
-    if (event->type == GDK_BUTTON_RELEASE && event->button == 1 && false == plot.zoomed)  
+    if (event->type == GDK_BUTTON_RELEASE && event->button == 1)  
     {
-        plot.zoom_factor_x = fabs(end_x - start_x) / GRAPH_WIDTH;
-        plot.zoom_factor_y = fabs(end_y - start_y) / GRAPH_HEIGHT; 
-        selection_mode = false; 
+        draw_zoom = true;
+        
+        // selection end point in zoomed frame
+        double ex = plot.xmin + (end_x - OFFSET_X) * (plot.xmax - plot.xmin) /  GRAPH_WIDTH;
+        double ey = plot.ymax - (end_y - OFFSET_Y) * (plot.ymax - plot.ymin) /  GRAPH_HEIGHT;
+        
+         // selection start point in unzoomed frame, we always zoom wrt unzoomed frame coordinates.
+        plot.zoom_end_x = OFFSET_X + (ex - xmin)  / (xmax - xmin) * GRAPH_WIDTH;
+        plot.zoom_end_y = OFFSET_Y + (ymax - ey)  / (ymax - ymin) * GRAPH_HEIGHT;
+
+        plot.zoom_factor_x = fabs(plot.zoom_end_x - plot.zoom_start_x) / GRAPH_WIDTH;
+        plot.zoom_factor_y = fabs(plot.zoom_end_y - plot.zoom_start_y) / GRAPH_HEIGHT; 
+        selection_mode = false;      
         
         // save guard the user double click and too small a region selected
         if (plot.zoom_factor_x < 0.001 || plot.zoom_factor_x < 0.001) return true;
-
-        draw_zoom = true;
-        plot.zoom_end_x = end_x;
-        plot.zoom_end_y = end_y;
     }
     else if (event->type == GDK_BUTTON_RELEASE && event->button == 3)
     {
@@ -82,8 +92,6 @@ bool CGraph::CairoGraph::on_motion_notify_event(GdkEventMotion *event)
         yvalue->set_text(Glib::ustring::format(y));
         get_window()->set_cursor(cross_hair_cursor);
     }
-
-    if (plot.zoomed == true) return true; // to do allow for more zoom levels, for now disable if greater than one level
 
     if (scaled_x > OFFSET_X && scaled_x < OFFSET_X + GRAPH_WIDTH &&
         scaled_y > OFFSET_Y && scaled_y < OFFSET_Y + GRAPH_HEIGHT && true == selection_mode)

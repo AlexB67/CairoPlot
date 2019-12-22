@@ -202,10 +202,7 @@ void CGraph::CairoGraph::draw_multi_series(const Cairo::RefPtr<Cairo::Context> &
 
 
     if (true == draw_zoom) // to do allow for more zoom levels currently one
-    {
-        if (plot.zoom_start_x > plot.zoom_end_x) std::swap(plot.zoom_start_x, plot.zoom_end_x);
-        if (plot.zoom_start_y > plot.zoom_end_y) std::swap(plot.zoom_start_y, plot.zoom_end_y);
-        
+    {   
         cr->translate(OFFSET_X - plot.zoom_start_x  / plot.zoom_factor_x , OFFSET_Y - plot.zoom_start_y / plot.zoom_factor_y);
 
         plot.xmin = xmin + (plot.zoom_start_x - OFFSET_X) * (xmax - xmin) / GRAPH_WIDTH;
@@ -271,12 +268,9 @@ void CGraph::CairoGraph::draw_single_series(const Cairo::RefPtr<Cairo::Context> 
     cr->rectangle(OFFSET_X, OFFSET_Y, GRAPH_WIDTH, GRAPH_HEIGHT); 
     cr->clip();
 
-   if (true == draw_zoom) // to do allow for more zoom levels currently one
-    {
-        if (plot.zoom_start_x > plot.zoom_end_x) std::swap(plot.zoom_start_x, plot.zoom_end_x);
-        if (plot.zoom_start_y > plot.zoom_end_y) std::swap(plot.zoom_start_y, plot.zoom_end_y);
-        
-        cr->translate(OFFSET_X - plot.zoom_start_x  / plot.zoom_factor_x , OFFSET_Y - plot.zoom_start_y / plot.zoom_factor_y);
+   if (true == draw_zoom)
+    {   
+        cr->translate(OFFSET_X - plot.zoom_start_x / plot.zoom_factor_x, OFFSET_Y - plot.zoom_start_y / plot.zoom_factor_y);
 
         plot.xmin = xmin + (plot.zoom_start_x - OFFSET_X) * (xmax - xmin) / GRAPH_WIDTH;
         plot.xmax = xmin + (plot.zoom_end_x - OFFSET_X) * (xmax - xmin) / GRAPH_WIDTH;

@@ -327,8 +327,7 @@ void CairoplotWindow::create_header_and_menus()
 
 	add_action("help", [this](){
 		Glib::ustring message;
-		message = _("To zoom in hold down the left mouse button and drag an area, then release. Right click resets. " 
-					"There is only one zoom level.\n\n"  
+		message = _("To zoom in hold down the left mouse button and drag out a rectanglular area, then release. Right click resets."  
 					"Use the controls on the right to change graph properties.");
 		Gtk::MessageDialog message_dialog(message, true, Gtk::MESSAGE_INFO, Gtk::BUTTONS_CLOSE, true);
     	message_dialog.run();
@@ -393,8 +392,7 @@ void CairoplotWindow::make_plot()
 			t[i]  = j;
 			a[i]  = velocity + 0.5 * accel * t[i] * t[i];
 			j +=  0.25 * 100.0 / 99.0;
-		}	
-		
+		}
 	}
 	else // multi series
 	{
