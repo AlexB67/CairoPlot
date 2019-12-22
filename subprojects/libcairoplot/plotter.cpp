@@ -45,7 +45,7 @@ bool CGraph::CairoGraph::on_draw(const Cairo::RefPtr<Cairo::Context> &cr)
     cr->scale(w, h); // We will often work in a unit square (scaled coordinates) when useful
 
     // Create the linear gradient top to bottom
-
+    
     if (selection_mode == false)
     {
         // we create a surface to write on and restore it when zooming
