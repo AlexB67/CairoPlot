@@ -58,7 +58,6 @@ bool CGraph::CairoGraph::on_button_release_event(GdkEventButton *event)
     {
         plot.zoom_factor_x = 1.0;
         plot.zoom_factor_y = 1.0;
-        plot.zoomed = false;
         draw_zoom = false;
         selection_mode = false;
     }

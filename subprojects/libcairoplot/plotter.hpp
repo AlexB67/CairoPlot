@@ -142,7 +142,6 @@ namespace CGraph
             double zoom_end_x;
             double zoom_start_y;
             double zoom_end_y;
-            bool zoomed = false;
         };
 
         graph_params plot;

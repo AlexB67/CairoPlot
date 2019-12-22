@@ -45,7 +45,7 @@ bool CGraph::CairoGraph::on_draw(const Cairo::RefPtr<Cairo::Context> &cr)
     cr->scale(w, h); // We will often work in a unit square (scaled coordinates) when useful
 
     // Create the linear gradient top to bottom
-    
+
     if (selection_mode == false)
     {
         // we create a surface to write on and restore it when zooming
@@ -201,7 +201,7 @@ void CGraph::CairoGraph::draw_multi_series(const Cairo::RefPtr<Cairo::Context> &
     cr->clip();
 
 
-    if (true == draw_zoom) // to do allow for more zoom levels currently one
+    if (true == draw_zoom)
     {   
         cr->translate(OFFSET_X - plot.zoom_start_x  / plot.zoom_factor_x , OFFSET_Y - plot.zoom_start_y / plot.zoom_factor_y);
 
@@ -209,7 +209,6 @@ void CGraph::CairoGraph::draw_multi_series(const Cairo::RefPtr<Cairo::Context> &
         plot.xmax = xmin + (plot.zoom_end_x - OFFSET_X) * (xmax - xmin) / GRAPH_WIDTH;
         plot.ymin = ymin + (GRAPH_HEIGHT + OFFSET_Y - plot.zoom_end_y) * (ymax - ymin) / GRAPH_HEIGHT;
         plot.ymax = ymin + (GRAPH_HEIGHT + OFFSET_Y - plot.zoom_start_y) * (ymax - ymin) / GRAPH_HEIGHT;
-        plot.zoomed = true;
     }
     else
     {
@@ -276,7 +275,6 @@ void CGraph::CairoGraph::draw_single_series(const Cairo::RefPtr<Cairo::Context> 
         plot.xmax = xmin + (plot.zoom_end_x - OFFSET_X) * (xmax - xmin) / GRAPH_WIDTH;
         plot.ymin = ymin + (GRAPH_HEIGHT + OFFSET_Y - plot.zoom_end_y) * (ymax - ymin) / GRAPH_HEIGHT;
         plot.ymax = ymin + (GRAPH_HEIGHT + OFFSET_Y - plot.zoom_start_y) * (ymax - ymin) / GRAPH_HEIGHT;
-        plot.zoomed = true;
     }
     else
     {
@@ -453,7 +451,6 @@ void CGraph::CairoGraph::clear_graph()
     text_objects.clear();
     plot.zoom_factor_x = 1.0;
     plot.zoom_factor_y = 1.0;
-    plot.zoomed = false;
     legend_offsetx = 0.0;
     legend_offsety = 0.0;
     legend_scale = 1.0;
