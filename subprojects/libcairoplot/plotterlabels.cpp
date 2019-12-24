@@ -28,8 +28,6 @@ void CGraph::CairoGraph::create_tickmark_labels(const Cairo::RefPtr<Cairo::Conte
 
     cr->set_source_rgba(axes_colour.get_red(), axes_colour.get_green(), axes_colour.get_blue(), 1.0);
 
-    if (ymax > 999999) forcescientificy = true;
-
     if (true == forcescientificy)
     {
         labely[0] = Glib::ustring::format(std::scientific, plot.ymax);
@@ -129,8 +127,6 @@ void CGraph::CairoGraph::create_tickmark_labels(const Cairo::RefPtr<Cairo::Conte
             ++j;
         }
     }
-
-    if (xmax > 999999) forcescientificx = true;
 
     if (true == forcescientificx)
     {

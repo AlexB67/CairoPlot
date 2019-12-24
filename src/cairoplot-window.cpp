@@ -327,7 +327,7 @@ void CairoplotWindow::create_header_and_menus()
 
 	add_action("help", [this](){
 		Glib::ustring message;
-		message = _("To zoom in hold down the left mouse button and drag out a rectanglular area, then release. Right click resets."  
+		message = _("To zoom in hold down the left mouse button and drag out a rectanglular area, then release. Right click resets. "  
 					"Use the controls on the right to change graph properties.");
 		Gtk::MessageDialog message_dialog(message, true, Gtk::MESSAGE_INFO, Gtk::BUTTONS_CLOSE, true);
     	message_dialog.run();

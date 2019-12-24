@@ -203,6 +203,9 @@ void CGraph::CairoGraph::draw_multi_series(const Cairo::RefPtr<Cairo::Context> &
 
     if (true == draw_zoom)
     {   
+        if(plot.zoom_end_x < plot.zoom_start_x) std::swap(plot.zoom_start_x, plot.zoom_end_x);
+        if(plot.zoom_end_y < plot.zoom_start_y) std::swap(plot.zoom_start_y, plot.zoom_end_y);
+
         cr->translate(OFFSET_X - plot.zoom_start_x  / plot.zoom_factor_x , OFFSET_Y - plot.zoom_start_y / plot.zoom_factor_y);
 
         plot.xmin = xmin + (plot.zoom_start_x - OFFSET_X) * (xmax - xmin) / GRAPH_WIDTH;
@@ -269,6 +272,9 @@ void CGraph::CairoGraph::draw_single_series(const Cairo::RefPtr<Cairo::Context> 
 
    if (true == draw_zoom)
     {   
+        if(plot.zoom_end_x < plot.zoom_start_x) std::swap(plot.zoom_start_x, plot.zoom_end_x);
+        if(plot.zoom_end_y < plot.zoom_start_y) std::swap(plot.zoom_start_y, plot.zoom_end_y);
+
         cr->translate(OFFSET_X - plot.zoom_start_x / plot.zoom_factor_x, OFFSET_Y - plot.zoom_start_y / plot.zoom_factor_y);
 
         plot.xmin = xmin + (plot.zoom_start_x - OFFSET_X) * (xmax - xmin) / GRAPH_WIDTH;
