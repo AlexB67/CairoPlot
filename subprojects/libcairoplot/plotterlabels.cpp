@@ -38,11 +38,12 @@ void CGraph::CairoGraph::create_tickmark_labels(const Cairo::RefPtr<Cairo::Conte
     }
     else if (precisiony > 0 && false == showpointy) // formatted to width
     {
-        labely[0] = Glib::ustring::format(std::fixed, std::setprecision(precisiony),  plot.ymax);
-        labely[1] = Glib::ustring::format(std::fixed, std::setprecision(precisiony),  plot.ymin + 0.75 * (plot.ymax - plot.ymin));
-        labely[2] = Glib::ustring::format(std::fixed, std::setprecision(precisiony),  plot.ymin + 0.50 * (plot.ymax - plot.ymin));
-        labely[3] = Glib::ustring::format(std::fixed, std::setprecision(precisiony),  plot.ymin + 0.25 * (plot.ymax - plot.ymin));
-        labely[4] = Glib::ustring::format(std::fixed, std::setprecision(precisiony),  plot.ymin);
+        int precision = precisiony + static_cast<int>(log10(1.0 / plot.zoom_factor_y));
+        labely[0] = Glib::ustring::format(std::fixed, std::setprecision(precision),  plot.ymax);
+        labely[1] = Glib::ustring::format(std::fixed, std::setprecision(precision),  plot.ymin + 0.75 * (plot.ymax - plot.ymin));
+        labely[2] = Glib::ustring::format(std::fixed, std::setprecision(precision),  plot.ymin + 0.50 * (plot.ymax - plot.ymin));
+        labely[3] = Glib::ustring::format(std::fixed, std::setprecision(precision),  plot.ymin + 0.25 * (plot.ymax - plot.ymin));
+        labely[4] = Glib::ustring::format(std::fixed, std::setprecision(precision),  plot.ymin);
     }
     else if (true == showpointy) // nicely formatted
     {
@@ -138,11 +139,12 @@ void CGraph::CairoGraph::create_tickmark_labels(const Cairo::RefPtr<Cairo::Conte
     }
     else if (precisionx > 0 && false == showpointx) // formatted to width
     {
-        labelx[0] = Glib::ustring::format(std::fixed, std::setprecision(precisionx),  plot.xmax);
-        labelx[1] = Glib::ustring::format(std::fixed, std::setprecision(precisionx),  plot.xmin + 0.75 * (plot.xmax - plot.xmin));
-        labelx[2] = Glib::ustring::format(std::fixed, std::setprecision(precisionx),  plot.xmin + 0.50 * (plot.xmax - plot.xmin));
-        labelx[3] = Glib::ustring::format(std::fixed, std::setprecision(precisionx),  plot.xmin + 0.25 * (plot.xmax - plot.xmin));
-        labelx[4] = Glib::ustring::format(std::fixed, std::setprecision(precisionx),  plot.xmin);
+        int precision = precisionx + static_cast<int>(log10(1.0 / plot.zoom_factor_x));
+        labelx[0] = Glib::ustring::format(std::fixed, std::setprecision(precision),  plot.xmax);
+        labelx[1] = Glib::ustring::format(std::fixed, std::setprecision(precision),  plot.xmin + 0.75 * (plot.xmax - plot.xmin));
+        labelx[2] = Glib::ustring::format(std::fixed, std::setprecision(precision),  plot.xmin + 0.50 * (plot.xmax - plot.xmin));
+        labelx[3] = Glib::ustring::format(std::fixed, std::setprecision(precision),  plot.xmin + 0.25 * (plot.xmax - plot.xmin));
+        labelx[4] = Glib::ustring::format(std::fixed, std::setprecision(precision),  plot.xmin);
     }
     else if (true == showpointx) // nicely formated
     {

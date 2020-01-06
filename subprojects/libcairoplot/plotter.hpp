@@ -136,8 +136,8 @@ namespace CGraph
             double xmax;
             double ymin;
             double ymax;
-            double zoom_factor_x;
-            double zoom_factor_y;
+            double zoom_factor_x = 1.0;
+            double zoom_factor_y = 1.0;
             double zoom_start_x;
             double zoom_end_x;
             double zoom_start_y;
