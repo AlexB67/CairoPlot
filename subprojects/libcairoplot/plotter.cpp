@@ -27,12 +27,6 @@ CGraph::CairoGraph::CairoGraph()
     set_size_request(start_height, start_height);
 }
 
-void CGraph::CairoGraph::set_title(const Glib::ustring& title)
-{
-    graph_title.clear();
-    graph_title = title;
-}
-
 bool CGraph::CairoGraph::on_draw(const Cairo::RefPtr<Cairo::Context> &cr)
 {
     Gtk::Allocation allocation = get_allocation();
@@ -148,8 +142,12 @@ bool CGraph::CairoGraph::on_draw(const Cairo::RefPtr<Cairo::Context> &cr)
         draw_single_series(cr);
         draw_multi_series(cr);
 
-        // Axes and labels
-        create_tickmark_labels(cr);
+         // Axes and labels
+        if (m_xvalues.size() > 1 || seriesx.size() > 1)
+        {
+            create_tickmark_labels(cr);
+        }
+
         create_labels(cr);
 
         // draw a border for system themes
@@ -195,7 +193,7 @@ void CGraph::CairoGraph::draw_multi_series(const Cairo::RefPtr<Cairo::Context> &
 {
     if(!seriesy.size() || !seriesy.size()) return;
 
-    cr->set_line_width(0.0025);
+    cr->set_line_width(lwidth * 0.0025);
     cr->save();
     cr->rectangle(OFFSET_X, OFFSET_Y, GRAPH_WIDTH, GRAPH_HEIGHT); 
     cr->clip();
@@ -265,7 +263,7 @@ void CGraph::CairoGraph::draw_single_series(const Cairo::RefPtr<Cairo::Context> 
 {
     if(m_xvalues.size() < 2 || m_yvalues.size() < 2) return;
 
-    cr->set_line_width(0.0025);
+    cr->set_line_width(lwidth * 0.0025);
     cr->save();
     cr->rectangle(OFFSET_X, OFFSET_Y, GRAPH_WIDTH, GRAPH_HEIGHT); 
     cr->clip();

@@ -388,6 +388,7 @@ void CGraph::CairoGraph::create_labels(const Cairo::RefPtr<Cairo::Context> &cr)
         set_font_scale(1.0, &font, h, w);
         auto titlelayout = create_pango_layout(graph_title);
         titlelayout->set_font_description(font);
+        titlelayout->set_markup(graph_title);
         titlelayout->get_pixel_size(label_width, label_height);
         cr->get_current_point(xpos, ypos);
         cr->move_to(xpos - 0.5 * label_width, +5.0 * h / start_height);

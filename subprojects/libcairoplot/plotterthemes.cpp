@@ -2,12 +2,23 @@
 #include <iostream>
 
 const Glib::ustring& CGraph::CairoGraph::get_theme_name() const 
-{
-     return current_theme;
+{   
+    //! Get the current theme name 
+    return current_theme;
 }
 
 void CGraph::CairoGraph::set_theme(const Glib::ustring& theme, bool automatic)
 {
+    //! Set the graph theme.
+    //! theme: the theme name
+    //! automatic: Whether to automatically assign line colours baseed on theme, this is true by default.
+    //!
+    //! if not specified the theme is name is Black
+    //! If set to "Default", desktop theme colours will be used
+    //!
+    //! Supported themes are 
+    //!  "Fade to black", "Herculean blue", "Black", "Midnight blue", "Dark", "Default"
+
     if ( "Fade to black" == theme)
     {
         current_theme = theme;

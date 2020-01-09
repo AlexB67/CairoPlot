@@ -79,8 +79,9 @@ namespace CGraph
 
         // graph methods
         void update_graph();
-        void set_background_style(const Gdk::RGBA colour1, const Gdk::RGBA colour2);
-        void set_background_style(const Gdk::RGBA colour1);
+        void set_line_width(const double linewidth);
+        void set_background_colour(const Gdk::RGBA colour1, const Gdk::RGBA colour2);
+        void set_background_colour(const Gdk::RGBA colour1);
         void set_axes_labels(const Glib::ustring &xlabel, const Glib::ustring &ylabel, Glib::ustring fontfamily = _("Nimbus Roman"));
         void set_tick_label_format_x(const bool showpointx, const int precision);
         void set_tick_label_format_y(const bool showpointy, const int precision);
@@ -107,6 +108,7 @@ namespace CGraph
         void add_text_objects(const std::vector<std::tuple<Glib::ustring, double, double, double, bool> >& text);
 
     private:
+        double lwidth = 1.0; // default line width
         double xmax;
         double xmin;
         double ymax;
