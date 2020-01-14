@@ -7,5 +7,7 @@ Simply clone the repo and load the project in gnome-builder
 
 https://github.com/AlexB67/CairoPlot.git
 
+The project is build with CairoPLot as a meson subproject.
+
 flatpak builds work in gnome-builder as well.
 
