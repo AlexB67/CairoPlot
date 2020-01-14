@@ -80,27 +80,31 @@ void CGraph::CairoGraph::set_theme(const Glib::ustring& theme, bool automatic)
 
     if (false == automatic) return;
 
+    set_series_colours();
     // automatic line colouring if requested
+}
 
-    if (axes_colour.get_red() < 0.25 && axes_colour.get_green() < 0.25 && axes_colour.get_blue() < 0.25)
+void CGraph::CairoGraph::set_series_colours()
+{
+     if (axes_colour.get_red() < 0.25 && axes_colour.get_green() < 0.25 && axes_colour.get_blue() < 0.25)
     {   // prabably a light theme
-        for (size_t i = seriescolour.size(); i < seriesy.size(); ++i)
+        for (size_t i = seriescolour.size(); i < numpoints.size(); ++i)
         {
             Gdk::RGBA colour;
             colour.set_rgba(0.0,
-                            0.5 * static_cast<double>(seriesy.size() - i) / seriesy.size(),
-                            0.5 * static_cast<double>(seriesy.size() - i) / seriesy.size(), 1.0);
+                            0.5 * static_cast<double>(numpoints.size() - i) / numpoints.size(),
+                            0.5 * static_cast<double>(numpoints.size() - i) / numpoints.size(), 1.0);
             seriescolour.emplace_back(colour);
         }
     }
     else
     {
-        for (size_t i = seriescolour.size(); i < seriesy.size(); ++i)
+        for (size_t i = seriescolour.size(); i < numpoints.size(); ++i)
         {
             Gdk::RGBA colour;
-            colour.set_rgba(1.0 * static_cast<double>(i + 1) / seriesy.size(),
-                            0.5 + 0.5 * static_cast<double>(i + 1) / seriesy.size(),
-                            0.5 + 0.5 * static_cast<double>(i + 1) / seriesy.size(), 1.0);
+            colour.set_rgba(1.0 * static_cast<double>(i + 1) / numpoints.size(),
+                            0.5 + 0.5 * static_cast<double>(i + 1) / numpoints.size(),
+                            0.5 + 0.5 * static_cast<double>(i + 1) / numpoints.size(), 1.0);
             seriescolour.emplace_back(colour);
         }
     }

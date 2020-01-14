@@ -212,12 +212,12 @@ CairoplotWindow::CairoplotWindow(const Glib::RefPtr<Gtk::Application>& app)
 	start_time->signal_changed().connect(sigc::mem_fun(*this, &CairoplotWindow::make_plot));
 
 	setscifiy->property_active().signal_changed().connect([this](){
-		graph->force_scientific_notation(setscifix->get_active(), setscifiy->get_active());
+		graph->use_scientific_notation(setscifix->get_active(), setscifiy->get_active());
 		graph->update_graph();
 	});
 
 	setscifix->property_active().signal_changed().connect([this](){
-		graph->force_scientific_notation(setscifix->get_active(), setscifiy->get_active());
+		graph->use_scientific_notation(setscifix->get_active(), setscifiy->get_active());
 		graph->update_graph();
 	});
 
@@ -344,7 +344,7 @@ void CairoplotWindow::about()
 
 	aboutdialog.set_logo(Gdk::Pixbuf::create_from_resource("/org/gnome/plotter/plotter.png", 128, 128, true));
 	aboutdialog.set_program_name(_("Cairo plot"));
-	aboutdialog.set_version("0.0.1");
+	aboutdialog.set_version("0.0.5");
 	aboutdialog.set_copyright("Alexander Borro");
 	aboutdialog.set_comments(_("Plotting 2D graphs using Cairomm."));
 	aboutdialog.set_license("GPL v3.0    http://www.gnu.org/licenses");
@@ -374,15 +374,6 @@ void CairoplotWindow::make_plot()
 {
 	double velocity = start_velocity->get_value();
 	double accel = gravitational_constant->get_value();
-
-	constexpr size_t size = 100;
-	constexpr size_t numplots = 3;
-	std::vector<double> t(size);
-	std::vector<double> a(size);
-	std::vector<std::vector<double> > xseries(numplots, t);
-	std::vector<std::vector<double> > yseries(numplots, a);
-
-
 	double j = start_time->get_value();
 
 	if ( true == single_series) 
@@ -419,7 +410,7 @@ void CairoplotWindow::make_plot()
 	if ( true == single_series ) 
 	{
 		Glib::ustring legend = "<i>s</i> = <i>v</i><sub>o</sub> + 0.5(" + Glib::ustring::format(accel) + ")<i>t</i><sup>2</sup>";
-		graph->add_series(t, a, linecolour->get_rgba(), static_cast<CairoGraphLineStyle>(selectlinestyle->get_active_row_number()));
+		graph->add_series(t, a, linecolour->get_rgba(), static_cast<CairoGraphLineStyle>(selectlinestyle->get_active_row_number()), false);
 		
 		if (false == hidelegend->get_active()) graph->add_single_legend(legend, CairoGraphPos::LEGEND_TOP, true);
 	}
@@ -430,7 +421,7 @@ void CairoplotWindow::make_plot()
 		legends[1] = "<i>s</i> = <i>v</i><sub>o</sub> + 0.5(3.71)<i>t</i><sup>2</sup>";
 		legends[2] = "<i>s</i> = <i>v</i><sub>o</sub> + 0.5(5.55)<i>t</i><sup>2</sup>";
 
-		graph->add_multi_series(xseries, yseries);
+		graph->add_multi_series(xseries, yseries, false);
 		
 		if (false == hidelegend->get_active()) graph->add_multi_legends(legends);
 	}

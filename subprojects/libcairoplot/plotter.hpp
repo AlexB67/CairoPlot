@@ -13,14 +13,14 @@ namespace CarioGraphConstants
 {
     constexpr double BOX_LINEWIDTH = 1.5;
     constexpr double GRID_LINEWIDTH = 0.0005; // in scaled coordinates
-    constexpr double OFFSET_X = 0.1950;
+    constexpr double OFFSET_X = 0.1750;
     constexpr double OFFSET_Y = 0.1000;
-    constexpr double GRAPH_WIDTH = 0.700;
+    constexpr double GRAPH_WIDTH = 0.720;
     constexpr double GRAPH_HEIGHT = 0.720;
     constexpr double TICKS_LENGTH = 0.010;
     const std::vector<double> dashes1{5.0, 2.5};
     const std::vector<double> dashes2{2.5, 2.5};
-    const std::vector<double> dashes3{0.008, 0.012};
+    const std::vector<double> dashes3{0.008, 0.012}; // in scaled coordinates
     constexpr int start_height = 256;
     constexpr int start_width = 256;
 
@@ -85,18 +85,23 @@ namespace CGraph
         void set_axes_labels(const Glib::ustring &xlabel, const Glib::ustring &ylabel, Glib::ustring fontfamily = _("Nimbus Roman"));
         void set_tick_label_format_x(const bool showpointx, const int precision);
         void set_tick_label_format_y(const bool showpointy, const int precision);
-        void add_multi_series(const std::vector<std::vector<double>> &xvalues, const std::vector<std::vector<double>> &yvalues);
 
-        void add_series(const std::vector<double> &xvalues, const std::vector<double> &yvalues,
-                        const Gdk::RGBA linecolour, const CairoGraphLineStyle style);
+        void add_multi_series(  const std::vector<std::vector<double>> &xvalues, 
+                                const std::vector<std::vector<double>> &yvalues, 
+                                bool make_copy = true);
 
+        void add_series(const std::vector<double> &xvalues, 
+                        const std::vector<double> &yvalues,
+                        const Gdk::RGBA linecolour, 
+                        const CairoGraphLineStyle style, 
+                        bool make_copy = true);
+        
         void add_multi_legends(const std::vector<Glib::ustring> &legends, const double offsetx = 0.0, const double offsety = 0.0);
         void add_single_legend(const Glib::ustring &legend, CairoGraphPos pos, const bool showlinecolour);
         void show_legend(const bool show);
         void set_legend_scale(const double scale);
-        void add_text(/*const Glib::ustring& text, const double x, const double y */); // todo
         const Glib::ustring &get_theme_name() const;
-        void force_scientific_notation(const bool scientificx, const bool scientificy);
+        void use_scientific_notation(const bool scientificx, const bool scientificy);
         void set_line_colour(const size_t seriesnum, Gdk::RGBA colour);
         void add_line_colours(const std::vector<Gdk::RGBA> &colours);
         void set_axes_colour(const Gdk::RGBA colour);
@@ -170,10 +175,23 @@ namespace CGraph
         Gdk::RGBA border_colour;
         Cairo::RefPtr<Cairo::LinearGradient> gradient;
         Glib::RefPtr<Gdk::Cursor> cross_hair_cursor;
+        
+        // Single plots
         std::vector<double> m_xvalues;
         std::vector<double> m_yvalues;
-        std::vector<std::vector<double>> seriesx;
-        std::vector<std::vector<double>> seriesy;
+        double *m_spx = nullptr; // pointer to X values;
+        double *m_spy = nullptr; // pointer to y values;
+        size_t numpts = 0; // numer of points in single plot 
+        // End single plots
+        
+        // Multi plots
+        std::vector<std::vector<double>> seriesx; // multi plots
+        std::vector<std::vector<double>> seriesy; // multi plots
+        std::vector<double *> m_px; // vector of pointers to plots
+        std::vector<double *> m_py; // vector of pointers to plots
+        std::vector<size_t> numpoints; // number of point in each plot
+        // End multi plots
+        
         std::vector<std::tuple<Glib::ustring, double, double, double, bool> > text_objects;
         Cairo::RefPtr<Cairo::ImageSurface> canvas;
 
@@ -181,9 +199,12 @@ namespace CGraph
         void create_labels(const Cairo::RefPtr<Cairo::Context> &cr);
         void create_legends(const Cairo::RefPtr<Cairo::Context> &cr);
         void set_font_scale(const double scale, Pango::FontDescription *font, const int h, const int w) const;
-        void draw_multi_series(const Cairo::RefPtr<Cairo::Context> &cr);
+        void draw_series(const Cairo::RefPtr<Cairo::Context> &cr);
         void draw_single_series(const Cairo::RefPtr<Cairo::Context> &cr);
-        void clear_graph();
+        void set_series_colours();
+        void clear_series();
+        double x_to_graph_coords(const double x) const;
+        double y_to_graph_coords(const double y) const;
 
         //events
         bool on_draw(const Cairo::RefPtr<Cairo::Context> &cr) override;

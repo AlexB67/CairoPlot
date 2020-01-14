@@ -4,7 +4,7 @@ using namespace CarioGraphConstants;
 
 void CGraph::CairoGraph::set_line_width(const double linewidth)
 {
-    //! Set the line width of the graph when the line style is CairoGraphLineStyle::SOLID_LINE
+    //! Set the line width of the graph when the line style is CairoGraphLineStyle::SOLID_LINE or DASHED_LINE
     //!A vale of 1 is the default line width. > 1 increases, < 1 decreases line width.
     lwidth = linewidth;
 }
@@ -100,7 +100,7 @@ void CGraph::CairoGraph::set_graph_box_style(const CairoGraphBoxStyle style)
     graphboxstyle = style;
 }
 
-void CGraph::CairoGraph::force_scientific_notation(const bool scientificx, const bool scientificy)
+void CGraph::CairoGraph::use_scientific_notation(const bool scientificx, const bool scientificy)
 {
     //! Use scienfici notation for the x or y axis
     //! scientificx: if true X axes labels will be displayed in scientific notation

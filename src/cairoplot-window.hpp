@@ -36,12 +36,17 @@
 #include <gtkmm/colorbutton.h>
 #include <glibmm/i18n.h>
 
+
+constexpr size_t size = 100;
+constexpr size_t numplots = 3;
+
 class CairoplotWindow : public Gtk::ApplicationWindow
 {
 public:
 	CairoplotWindow(const Glib::RefPtr<Gtk::Application>& app);
 
 private:
+
 	Glib::RefPtr<Gtk::Application> m_app;
 	Gtk::HeaderBar headerbar;
 	Glib::RefPtr<Gio::Menu> winmenu;
@@ -76,6 +81,12 @@ private:
 	Gtk::ComboBoxText *graphboxstyle;
 	Gtk::ColorButton *linecolour;
 	Glib::RefPtr<Gtk::SizeGroup> sizegroup;
+
+	std::vector<double> t = std::vector<double>(size);
+	std::vector<double> a = std::vector<double>(size);
+	std::vector<std::vector<double> > xseries = std::vector<std::vector<double> >(numplots, t);
+	std::vector<std::vector<double> > yseries = std::vector<std::vector<double> >(numplots, a);
+
 	bool single_series = true;
 	void make_plot();
 	void create_header_and_menus();

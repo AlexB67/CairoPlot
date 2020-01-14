@@ -21,7 +21,6 @@ CGraph::CairoGraph::CairoGraph()
     bg_colour1.set_rgba(0.0, 0.0, 0.0, 1.0); //  default background gradient
     bg_colour2.set_rgba(0.28, 0.28, 0.28, 1.0); // default background gradient
     axes_colour.set_rgba(1.0, 1.0, 1.0, 0.80);
-
     graphboxstyle = CairoGraphBoxStyle::BOX_GRID; // default graph style
     
     set_size_request(start_height, start_height);
@@ -110,43 +109,42 @@ bool CGraph::CairoGraph::on_draw(const Cairo::RefPtr<Cairo::Context> &cr)
             cr->unset_dash();
         }
 
-        // Draw major tickmarks Y axis
         cr->set_source_rgba(axes_colour.get_red(), axes_colour.get_green(), axes_colour.get_blue(), axes_colour.get_alpha());
         cr->set_line_width(BOX_LINEWIDTH);
-        cr->move_to(w * OFFSET_X, h * OFFSET_Y);
-        cr->line_to(w * (OFFSET_X - TICKS_LENGTH), h * OFFSET_Y);
-        cr->move_to(w * OFFSET_X, h * (OFFSET_Y + 0.25 * GRAPH_HEIGHT));
-        cr->line_to(w * (OFFSET_X - TICKS_LENGTH), h * (OFFSET_Y + 0.25 * GRAPH_HEIGHT));
-        cr->move_to(w * OFFSET_X, h * (OFFSET_Y + 0.50 * GRAPH_HEIGHT));
-        cr->line_to(w * (OFFSET_X - TICKS_LENGTH), h * (OFFSET_Y + 0.50 * GRAPH_HEIGHT));
-        cr->move_to(w * OFFSET_X, h * (OFFSET_Y + 0.75 * GRAPH_HEIGHT));
-        cr->line_to(w * (OFFSET_X - TICKS_LENGTH), h * (OFFSET_Y + 0.75 * GRAPH_HEIGHT));
-        cr->move_to(w * OFFSET_X, h * (OFFSET_Y + GRAPH_HEIGHT));
-        cr->line_to(w * (OFFSET_X - TICKS_LENGTH), h * (OFFSET_Y + GRAPH_HEIGHT));
+
+        double ticksy = TICKS_LENGTH;
+        double ticksx = TICKS_LENGTH;
+        if ( w > h ) ticksy = h * ticksx / w;
+        if ( h > w ) ticksx = w * ticksy / h;
+
+        double step = 0.0;
+
+        // Draw major tickmarks Y axis
+        for (short i = 0; i < 5; ++i)
+        {
+            cr->move_to(w * OFFSET_X, h * (OFFSET_Y + step * GRAPH_HEIGHT));
+            cr->line_to(w * (OFFSET_X - ticksy), h * (OFFSET_Y + step * GRAPH_HEIGHT));
+            step += 0.25;
+        }
 
         // Draw major tickmarks X axis
-        cr->move_to(w * OFFSET_X, h * (OFFSET_Y + GRAPH_HEIGHT));
-        cr->line_to(w * OFFSET_X, h * (OFFSET_Y + GRAPH_HEIGHT + TICKS_LENGTH));
-        cr->move_to(w * (OFFSET_X + 0.25 * GRAPH_WIDTH), h * (OFFSET_Y + GRAPH_HEIGHT));
-        cr->line_to(w * (OFFSET_X + 0.25 * GRAPH_WIDTH), h * (OFFSET_Y + GRAPH_HEIGHT + TICKS_LENGTH));
-        cr->move_to(w * (OFFSET_X + 0.50 * GRAPH_WIDTH), h * (OFFSET_Y + GRAPH_HEIGHT));
-        cr->line_to(w * (OFFSET_X + 0.50 * GRAPH_WIDTH), h * (OFFSET_Y + GRAPH_HEIGHT + TICKS_LENGTH));
-        cr->move_to(w * (OFFSET_X + 0.75 * GRAPH_WIDTH), h * (OFFSET_Y + GRAPH_HEIGHT));
-        cr->line_to(w * (OFFSET_X + 0.75 * GRAPH_WIDTH), h * (OFFSET_Y + GRAPH_HEIGHT + TICKS_LENGTH));
-        cr->move_to(w * (OFFSET_X + GRAPH_WIDTH), h * (OFFSET_Y + GRAPH_HEIGHT));
-        cr->line_to(w * (OFFSET_X + GRAPH_WIDTH), h * (OFFSET_Y + GRAPH_HEIGHT + TICKS_LENGTH));
+        step = 0.0;
+        for (short i = 0; i < 5; ++i)
+        {
+            cr->move_to(w * (OFFSET_X + step * GRAPH_WIDTH), h * (OFFSET_Y + GRAPH_HEIGHT));
+            cr->line_to(w * (OFFSET_X + step * GRAPH_WIDTH), h * (OFFSET_Y + GRAPH_HEIGHT + ticksx));
+            step += 0.25;
+        }
+
         cr->stroke();
         cr->restore();
 
         //  plot data
         draw_single_series(cr);
-        draw_multi_series(cr);
+        draw_series(cr);
 
          // Axes and labels
-        if (m_xvalues.size() > 1 || seriesx.size() > 1)
-        {
-            create_tickmark_labels(cr);
-        }
+        if (numpts > 1 || numpoints.size() > 0) create_tickmark_labels(cr);
 
         create_labels(cr);
 
@@ -167,7 +165,7 @@ bool CGraph::CairoGraph::on_draw(const Cairo::RefPtr<Cairo::Context> &cr)
         cr->restore();
     }
 
-    if (true == selection_mode) // TO DO zoomstack to allow for more than one zoom level
+    if (true == selection_mode)
     {
         // restore previously drawn canavas
         cr->scale(1.0 / w, 1.0 / h);
@@ -189,15 +187,14 @@ bool CGraph::CairoGraph::on_draw(const Cairo::RefPtr<Cairo::Context> &cr)
     return true;
 }
 
-void CGraph::CairoGraph::draw_multi_series(const Cairo::RefPtr<Cairo::Context> &cr)
+void CGraph::CairoGraph::draw_series(const Cairo::RefPtr<Cairo::Context> &cr)
 {
-    if(!seriesy.size() || !seriesy.size()) return;
+    if(!numpoints.size()) return;
 
     cr->set_line_width(lwidth * 0.0025);
     cr->save();
     cr->rectangle(OFFSET_X, OFFSET_Y, GRAPH_WIDTH, GRAPH_HEIGHT); 
     cr->clip();
-
 
     if (true == draw_zoom)
     {   
@@ -219,10 +216,14 @@ void CGraph::CairoGraph::draw_multi_series(const Cairo::RefPtr<Cairo::Context> &
         plot.ymax = ymax;
     }
 
-    for (size_t j = 0; j < seriesy.size(); ++j)
+    for (size_t j = 0; j < numpoints.size(); ++j)
     {
         cr->begin_new_path();
-        cr->move_to(seriesx[j][0] / plot.zoom_factor_x, seriesy[j][0] / plot.zoom_factor_y);
+
+        double x = x_to_graph_coords(m_px[j][0]) / plot.zoom_factor_x;
+        double y = y_to_graph_coords(m_py[j][0]) / plot.zoom_factor_y;
+
+        cr->move_to(x, y);
 
         cr->set_source_rgba(seriescolour[j].get_red(), seriescolour[j].get_green(),
                             seriescolour[j].get_blue(), seriescolour[j].get_alpha());
@@ -231,37 +232,41 @@ void CGraph::CairoGraph::draw_multi_series(const Cairo::RefPtr<Cairo::Context> &
             cr->set_dash(dashes3, 0);
         
         if (CairoGraphLineStyle::CIRCLE == serieslinestyle[j])
-            cr->arc(seriesx[j][0] / plot.zoom_factor_x, seriesy[j][0] / plot.zoom_factor_y, 0.002, 0.0, 2 * M_PI);
+            cr->arc(x, y, 0.002, 0.0, 2 * M_PI);
         
         if (CairoGraphLineStyle::DOTS == serieslinestyle[0])
-            cr->arc(seriesx[j][0] / plot.zoom_factor_x, seriesy[j][0] / plot.zoom_factor_y, 0.0005, 0.0, 2 * M_PI);
+            cr->arc(x, y, 0.0005, 0.0, 2 * M_PI);
 
-        for (size_t i = 1; i < seriesy[j].size(); ++i)
+        for (size_t i = 1; i < numpoints[j]; ++i)
         {
+            x = x_to_graph_coords(m_px[j][i]) / plot.zoom_factor_x;
+            y = y_to_graph_coords(m_py[j][i]) / plot.zoom_factor_y;
+
             if (CairoGraphLineStyle::SOLID_LINE == serieslinestyle[j] || CairoGraphLineStyle::DASHED_LINE == serieslinestyle[0])
             {
-                cr->line_to(seriesx[j][i] / plot.zoom_factor_x, seriesy[j][i] / plot.zoom_factor_y);
+                cr->line_to(x, y);
             }
             else if (CairoGraphLineStyle::CIRCLE == serieslinestyle[j])
             {
-                cr->move_to(seriesx[j][i] / plot.zoom_factor_x, seriesy[j][i] / plot.zoom_factor_y);
-                cr->arc(seriesx[j][i] / plot.zoom_factor_x, seriesy[j][i] / plot.zoom_factor_y, 0.002, 0.0, 2 * M_PI);
+                cr->move_to(x, y);
+                cr->arc(x, y, 0.002, 0.0, 2 * M_PI);
             }
             else if (CairoGraphLineStyle::DOTS == serieslinestyle[j])
             {
-                cr->move_to(seriesx[j][i] / plot.zoom_factor_x, seriesy[j][i] / plot.zoom_factor_y);
-                cr->arc(seriesx[j][i] / plot.zoom_factor_x, seriesy[j][i] / plot.zoom_factor_y, 0.0005, 0.0, 2 * M_PI);
+                cr->move_to(x, y);
+                cr->arc(x, y, 0.0005, 0.0, 2 * M_PI);
             }
         }
+
         cr->stroke();
-        cr->unset_dash();
     }
+
     cr->restore();
 }
 
 void CGraph::CairoGraph::draw_single_series(const Cairo::RefPtr<Cairo::Context> &cr)
 {
-    if(m_xvalues.size() < 2 || m_yvalues.size() < 2) return;
+    if(numpts < 2) return;
 
     cr->set_line_width(lwidth * 0.0025);
     cr->save();
@@ -291,176 +296,43 @@ void CGraph::CairoGraph::draw_single_series(const Cairo::RefPtr<Cairo::Context> 
     cr->set_source_rgba(seriescolour[0].get_red(), seriescolour[0].get_green(), 
                         seriescolour[0].get_blue(), seriescolour[0].get_alpha());
 
-    cr->move_to(m_xvalues[0] / plot.zoom_factor_x, m_yvalues[0] / plot.zoom_factor_y);
+    double x = x_to_graph_coords(m_spx[0]) / plot.zoom_factor_x;
+    double y = y_to_graph_coords(m_spy[0]) / plot.zoom_factor_y;
+
+    cr->move_to(x, y);
 
     if (CairoGraphLineStyle::DASHED_LINE == serieslinestyle[0])
         cr->set_dash(dashes3, 0);
 
     if (CairoGraphLineStyle::CIRCLE == serieslinestyle[0])
-        cr->arc(m_xvalues[0] / plot.zoom_factor_x, m_yvalues[0] / plot.zoom_factor_y, 0.002, 0.0, 2 * M_PI);
+        cr->arc(x, y, 0.002, 0.0, 2 * M_PI);
 
     if (CairoGraphLineStyle::DOTS == serieslinestyle[0])
-        cr->arc(m_xvalues[0] / plot.zoom_factor_x, m_yvalues[0] / plot.zoom_factor_y, 0.0005, 0.0, 2 * M_PI);
+        cr->arc(x, y, 0.0005, 0.0, 2 * M_PI);
 
-    for (size_t i = 1; i < m_xvalues.size(); ++i)
+    for (size_t i = 1; i < numpts; ++i)
     {
+        x = x_to_graph_coords(m_spx[i]) / plot.zoom_factor_x;
+        y = y_to_graph_coords(m_spy[i]) / plot.zoom_factor_y;
+
         if (CairoGraphLineStyle::SOLID_LINE == serieslinestyle[0] || CairoGraphLineStyle::DASHED_LINE == serieslinestyle[0])
         {
-            cr->line_to(m_xvalues[i] / plot.zoom_factor_x, m_yvalues[i] / plot.zoom_factor_y);
+            cr->line_to(x, y);
         }
         else if (CairoGraphLineStyle::CIRCLE == serieslinestyle[0])
         {
-            cr->move_to(m_xvalues[i] / plot.zoom_factor_x, m_yvalues[i] / plot.zoom_factor_y);
-            cr->arc(m_xvalues[i] / plot.zoom_factor_x, m_yvalues[i] / plot.zoom_factor_y, 0.002, 0.0, 2 * M_PI);
+            cr->move_to(x, y);
+            cr->arc(x, y, 0.002, 0.0, 2 * M_PI);
         }
         else if (CairoGraphLineStyle::DOTS == serieslinestyle[0])
         {
-            cr->move_to(m_xvalues[i] / plot.zoom_factor_x, m_yvalues[i] / plot.zoom_factor_y);
-            cr->arc(m_xvalues[i] / plot.zoom_factor_x, m_yvalues[i] / plot.zoom_factor_y, 0.0005, 0.0, 2 * M_PI);
+            cr->move_to(x, y);
+            cr->arc(x, y, 0.0005, 0.0, 2 * M_PI);
         }
     }
+
     cr->stroke();
     cr->restore();
-}
-
-void CGraph::CairoGraph::add_multi_series(const std::vector<std::vector<double>> &xvalues, const std::vector<std::vector<double>> &yvalues)
-{
-    // map data to graph coordinates, setup plot data
-
-    clear_graph();
-
-    xmax = ymax = std::numeric_limits<double>::min();
-    xmin = ymin = std::numeric_limits<double>::max();
-
-    for (size_t j = 0; j < xvalues.size(); ++j)
-    {   
-        seriesx.emplace_back(xvalues[j]);
-        seriesy.emplace_back(yvalues[j]);
-
-        for (size_t i = 0; i < xvalues[j].size(); ++i)
-        {
-            if (xvalues[j][i] < xmin)
-                xmin = xvalues[j][i];
-            if (xvalues[j][i] > xmax)
-                xmax = xvalues[j][i];
-            if (yvalues[j][i] < ymin)
-                ymin = yvalues[j][i];
-            if (yvalues[j][i] > ymax)
-                ymax = yvalues[j][i];
-        }
-    }
-
-    plot.xmin = xmin;
-    plot.xmax = xmax;
-    plot.ymin = ymin;
-    plot.ymax = ymax;
-
-    for (size_t j = 0; j < seriesx.size(); ++j)
-    {
-        for (size_t i = 0; i < seriesx[j].size(); ++i)
-        {
-            seriesx[j][i] = OFFSET_X + ((xvalues[j][i] - plot.xmin) * GRAPH_WIDTH) / (plot.xmax - plot.xmin);
-            seriesy[j][i] = OFFSET_Y + GRAPH_HEIGHT - ((yvalues[j][i] - plot.ymin) * GRAPH_HEIGHT) / (plot.ymax - plot.ymin);
-        }
-    }
-
-    if(seriescolour.size() < seriesy.size()) // The user didn't set colours for one or more plots so auto assign
-    {
-        if ("Adwaita" == current_theme)
-        {
-            for(size_t i = seriescolour.size(); i < seriesy.size(); ++i)
-            {
-                Gdk::RGBA colour;
-                colour.set_rgba(0.0, 
-                                0.5 * static_cast<double>(seriesy.size() - i) / seriesy.size(), 
-                                0.5 * static_cast<double>(seriesy.size() - i) / seriesy.size(), 1.0);
-                seriescolour.emplace_back(colour);
-            }
-        }
-        else
-        {
-            for(size_t i = seriescolour.size(); i < seriesy.size(); ++i)
-            {
-                Gdk::RGBA colour;
-                colour.set_rgba(1.0 * static_cast<double>(i + 1) / seriesy.size(), 
-                            0.5 + 0.5 * static_cast<double>(i + 1) / seriesy.size(), 
-                            0.5 + 0.5 * static_cast<double>(i + 1) / seriesy.size(), 1.0);
-                seriescolour.emplace_back(colour);
-            }
-        }
-    }
-
-    if (serieslinestyle.size() < seriesy.size()) // The user didn't set linestyles for one or more plots so auto assign
-        for (size_t i = serieslinestyle.size(); i < seriesy.size(); ++i) serieslinestyle.emplace_back(CairoGraphLineStyle::SOLID_LINE);
-}
-
-void CGraph::CairoGraph::add_series(const std::vector<double> &xvalues, const std::vector<double> &yvalues,
-                            const Gdk::RGBA linecolour, const CairoGraphLineStyle style)
-{
-    // map data to graph coordinates, setup plot data
-
-    if (xvalues.size() < 2 || yvalues.size() < 2) return;
-    if (xvalues.size() != yvalues.size()) return;
-
-    clear_graph();
-
-    xmax = ymax = std::numeric_limits<double>::min();
-    xmin = ymin = std::numeric_limits<double>::max();
-
-    size_t i = 0;
-    for (auto &iter : xvalues)
-    {
-        m_xvalues.emplace_back(iter);
-        m_yvalues.emplace_back(yvalues[i]);
-        
-        if (xvalues[i] < xmin)
-            xmin = xvalues[i];
-        if (xvalues[i] > xmax)
-            xmax = xvalues[i];
-        if (yvalues[i] < ymin)
-            ymin = yvalues[i];
-        if (yvalues[i] > ymax)
-            ymax = yvalues[i];
-        ++i;
-    }
-
-    plot.xmin = xmin;
-    plot.xmax = xmax;
-    plot.ymin = ymin;
-    plot.ymax = ymax;
-
-    i = 0;
-    for (auto &iter : m_xvalues)
-    {
-        iter = OFFSET_X + ((xvalues[i] - plot.xmin) * GRAPH_WIDTH) / (plot.xmax - plot.xmin);
-        m_yvalues[i] = OFFSET_Y + GRAPH_HEIGHT - ((yvalues[i] - plot.ymin) * GRAPH_HEIGHT) / (plot.ymax - plot.ymin);
-        ++i;
-    }
-
-    seriescolour.emplace_back(linecolour);
-    serieslinestyle.emplace_back(style);
-}
-
-void CGraph::CairoGraph::clear_graph()
-{
-    seriescolour.clear();
-    serieslinestyle.clear();
-    graph_legend.clear();
-    graph_legends.clear();
-    m_xvalues.clear();
-    m_yvalues.clear();
-    seriesx.clear();
-    seriesy.clear();
-    seriescolour.clear();
-    text_objects.clear();
-    plot.zoom_factor_x = 1.0;
-    plot.zoom_factor_y = 1.0;
-    legend_offsetx = 0.0;
-    legend_offsety = 0.0;
-    legend_scale = 1.0;
-    draw_zoom = false;
-    selection_mode = false;
-
 }
 
 void CGraph::CairoGraph::update_graph()

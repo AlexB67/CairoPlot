@@ -24,7 +24,10 @@ void CGraph::CairoGraph::create_tickmark_labels(const Cairo::RefPtr<Cairo::Conte
 
     const int w = allocation.get_width();
     const int h = allocation.get_height();
-    font.set_size(static_cast<int>(4.0 * PANGO_SCALE * w / start_width));
+
+    (static_cast<int>(4.0 * w / start_width) < 15) 
+    ? font.set_size(static_cast<int>(4.0 * PANGO_SCALE * w / start_width))
+    : font.set_size(PANGO_SCALE * 15);
 
     cr->set_source_rgba(axes_colour.get_red(), axes_colour.get_green(), axes_colour.get_blue(), 1.0);
 

@@ -14,6 +14,8 @@ gtkmmdeps = [
 inc = include_directories('.')
 libcairoplot = static_library('cairoplot',
     'plotter.cpp',
+    'plottercoords.cpp',
+    'plotterseries.cpp',
     'plotterlabels.cpp',
     'plotteroptions.cpp',
     'plotterthemes.cpp',
@@ -21,7 +23,7 @@ libcairoplot = static_library('cairoplot',
     'plotterevents.cpp',
   dependencies: gtkmmdeps,
   include_directories : inc,
-  install : true)
+  install : false)
 
 libcairoplot_dep = declare_dependency(include_directories : inc,
   link_with : libcairoplot)
