@@ -144,7 +144,8 @@ void CGraph::CairoGraph::init_plots(size_t numplots)
     m_py.resize(numplots);
 
     set_series_colours();
-    if (serieslinestyle.size() < 1) serieslinestyle.emplace_back(CairoGraphLineStyle::SOLID_LINE);
+    // If line styles have not been set auto assign
+    for ( size_t i = serieslinestyle.size(); i < numplots; ++i) serieslinestyle.emplace_back(CairoGraphLineStyle::SOLID_LINE);
 
 }
 
