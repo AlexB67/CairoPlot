@@ -8,9 +8,9 @@ void CGraph::CairoGraph::add_multi_series(  const std::vector<std::vector<double
                                             bool make_copy  )
 {
     //! Add multiple plots. This can only be called once per graph. Can be used for single or multiple plots 
-    //! xvalues: a vector of vectors of X values for 1 .. n plots.
-    //! yvalues: a vector of vectors of Y values for 1 .. n plots.
-    //! Whether to copy the X and Y values (true) or access values by reference (false), true is the default.
+    //! xvalues:   A vector of vectors of X values for 1 .. n plots.
+    //! yvalues:   A vector of vectors of Y values for 1 .. n plots.
+    //! make_copy: Whether to copy the X and Y values (true) or access values by reference (false), true is the default.
     //! The latter is useful for large data sets. Data will not be modified.
     //! ***************************************************
     //! line styles and colours are assigned automatically. 
@@ -18,9 +18,6 @@ void CGraph::CairoGraph::add_multi_series(  const std::vector<std::vector<double
     //! Use set_line_style set_line_colour to update existing plots.
 
     clear_series();
-
-    xmax = ymax = std::numeric_limits<double>::min();
-    xmin = ymin = std::numeric_limits<double>::max();
 
     for (size_t j = 0; j < xvalues.size(); ++j)
     {   
@@ -73,11 +70,11 @@ void CGraph::CairoGraph::add_series(const std::vector<double> &xvalues,
                                     bool make_copy)
 {
     //! Add a single plot. This can only be called once per graph. for multiple plots use add_multi_series 
-    //! xvalues: a vector of X values
-    //! yvalues: a vector of Y values
+    //! xvalues: a  vector of X values
+    //! yvalues: a  vector of Y values
     //! linecolour: RGBA value for line colour
-    //! style the line style, CairoGraphLineStyle::SOLID_LINE, DASHED_LINE CIRCLES or DOTS
-    //! Whether to copy the X and Y values (true) or access values by reference (false), true is the default.
+    //! style:     The line style, CairoGraphLineStyle::SOLID_LINE, DASHED_LINE CIRCLES or DOTS
+    //! make_copy: Whether to copy the X and Y values (true) or access values by reference (false), true is the default.
     //! The latter is useful for large data sets. Data will not be modified.
 
 
@@ -95,36 +92,31 @@ void CGraph::CairoGraph::add_series(const std::vector<double> &xvalues,
         return;
     }
 
-    xmax = ymax = std::numeric_limits<double>::min();
-    xmin = ymin = std::numeric_limits<double>::max();
+    numpoints.emplace_back(xvalues.size());
 
-    numpts = xvalues.size();
-
-    size_t i = 0;
-    for (auto &iter : xvalues)
+    if (true == make_copy)
     {
-        if ( true == make_copy)
-        {
-            m_xvalues.emplace_back(iter);
-            m_yvalues.emplace_back(yvalues[i]);
-        }
-        
-        if (xvalues[i] < xmin) xmin = xvalues[i];
-        if (xvalues[i] > xmax) xmax = xvalues[i];
-        if (yvalues[i] < ymin) ymin = yvalues[i];
-        if (yvalues[i] > ymax) ymax = yvalues[i];
-        ++i;
-    }
-
-    if ( true == make_copy)
-    {
-        m_spx = m_xvalues.data();
-        m_spy = m_yvalues.data();
+        seriesx.emplace_back(xvalues);
+        seriesy.emplace_back(yvalues);
+        m_px.emplace_back(seriesx[0].data());
+        m_py.emplace_back(seriesy[0].data());
     }
     else
     {
-        m_spx = const_cast<double *>(xvalues.data());
-        m_spy = const_cast<double *>(yvalues.data());
+        m_px.emplace_back(const_cast<double *>(xvalues.data()));
+        m_py.emplace_back(const_cast<double *>(yvalues.data()));
+    }
+
+    for (size_t i = 0; i < xvalues.size(); ++i)
+    {
+        if (xvalues[i] < xmin)
+            xmin = xvalues[i];
+        if (xvalues[i] > xmax)
+            xmax = xvalues[i];
+        if (yvalues[i] < ymin)
+            ymin = yvalues[i];
+        if (yvalues[i] > ymax)
+            ymax = yvalues[i];
     }
     
     plot.xmin = xmin;
@@ -136,22 +128,62 @@ void CGraph::CairoGraph::add_series(const std::vector<double> &xvalues,
     serieslinestyle.emplace_back(style);
 }
 
+void CGraph::CairoGraph::init_plots(size_t numplots)
+{
+    //! initialise the number of plots to be added to the graph.
+    //! This does not need to be called when using add_series or add add_multi_series
+    //! Only use when building plots point by point using the method add_point.
+    //! numplots: The number of plots
+
+    clear_series();
+    
+    numpoints.resize(numplots);
+    seriesx.resize(numplots);
+    seriesy.resize(numplots);
+    m_px.resize(numplots);
+    m_py.resize(numplots);
+
+    set_series_colours();
+    if (serieslinestyle.size() < 1) serieslinestyle.emplace_back(CairoGraphLineStyle::SOLID_LINE);
+
+}
+
+void CGraph::CairoGraph::add_point(size_t seriesnum, const double x, const double y, bool update_minmax)
+{
+    //! Build a single plot point by point. Do not mix with add_series or add_multi_series.
+    //! the plot number, stars at zero up to the number of plots - 1.
+    //! x: The x value
+    //! y: The y value
+    //! y: Whether to update the minimum and maximum plot range, true by default.
+    
+    seriesx[seriesnum].emplace_back(x);
+    seriesy[seriesnum].emplace_back(y);
+    m_px[seriesnum] = seriesx[seriesnum].data();
+    m_py[seriesnum] = seriesy[seriesnum].data();
+    numpoints[seriesnum] = seriesx[seriesnum].size();
+
+    if ( true == update_minmax)
+    {
+        if ( x < xmin) xmin = x;
+        if ( x > xmax) xmax = x;
+        if ( y < ymin) ymin = y;
+        if ( y > ymax) ymax = y;
+    }
+}
+
 void CGraph::CairoGraph::clear_series()
 {
+    xmax = ymax = std::numeric_limits<double>::min();
+    xmin = ymin = std::numeric_limits<double>::max();
     seriescolour.clear();
     serieslinestyle.clear();
     graph_legend.clear();
     graph_legends.clear();
-    m_xvalues.clear();
-    m_yvalues.clear();
     seriesx.clear();
     seriesy.clear();
     m_px.clear();
     m_py.clear();
-    m_spx = nullptr;
-    m_spy = nullptr;
     numpoints.clear();
-    numpts = 0;
     seriescolour.clear();
     text_objects.clear();
     plot.zoom_factor_x = 1.0;

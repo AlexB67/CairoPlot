@@ -17,7 +17,7 @@ void CGraph::CairoGraph::set_theme(const Glib::ustring& theme, bool automatic)
     //! If set to "Default", desktop theme colours will be used
     //!
     //! Supported themes are 
-    //!  "Fade to black", "Herculean blue", "Black", "Midnight blue", "Dark", "Default"
+    //! "Fade to black", "Herculean blue", "Black", "Midnight blue", "Dark", "Default"
 
     if ( "Fade to black" == theme)
     {
@@ -86,7 +86,7 @@ void CGraph::CairoGraph::set_theme(const Glib::ustring& theme, bool automatic)
 
 void CGraph::CairoGraph::set_series_colours()
 {
-     if (axes_colour.get_red() < 0.25 && axes_colour.get_green() < 0.25 && axes_colour.get_blue() < 0.25)
+    if (axes_colour.get_red() < 0.25 && axes_colour.get_green() < 0.25 && axes_colour.get_blue() < 0.25)
     {   // prabably a light theme
         for (size_t i = seriescolour.size(); i < numpoints.size(); ++i)
         {

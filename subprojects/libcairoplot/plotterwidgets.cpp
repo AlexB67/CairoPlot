@@ -4,7 +4,7 @@ Gtk::Grid &CGraph::CairoGraph::create_graph()
 {
     set_hexpand(true);
     set_vexpand(true);
-    set_size_request(256, 256); // give it something to being with
+    set_size_request(256, 256); // give it something to begin with
     xvalue->set_can_focus(false);
     yvalue->set_can_focus(false);
 

@@ -42,7 +42,7 @@ void CGraph::CairoGraph::set_background_colour(const Gdk::RGBA colour1, const Gd
 
 void CGraph::CairoGraph::set_background_colour(const Gdk::RGBA colour1)
 {
-    //! Set a custom backgroud colour for the graph.
+    //! Set a custom graph backgroud colour.
     bg_colour1 = colour1;
     bg_colour2 = colour1;
     queue_draw_area(0, 0,  get_allocation().get_width(), get_allocation().get_height());
@@ -50,6 +50,7 @@ void CGraph::CairoGraph::set_background_colour(const Gdk::RGBA colour1)
 
 void CGraph::CairoGraph::set_axes_colour(const Gdk::RGBA colour)
 {
+     //! Set axes colour. The same colour will be used for axes labels
     axes_colour = colour;
     queue_draw_area(0, 0,  get_allocation().get_width(), get_allocation().get_height());
 }
@@ -76,7 +77,7 @@ void CGraph::CairoGraph::add_line_colours(const std::vector<Gdk::RGBA>& colours)
 void CGraph::CairoGraph::set_line_style(const size_t seriesnum, const CairoGraphLineStyle style)
 {
     //! Update the line style of plot seriesnum to CairoGraphLineStyle style
-    //! Only use when a graph has already been added and you want ot change line style
+    //! Only use when a graph has already been added and you want to change line style
 
     if (seriesnum > serieslinestyle.size() - 1) return;
 
@@ -86,7 +87,7 @@ void CGraph::CairoGraph::set_line_style(const size_t seriesnum, const CairoGraph
 void CGraph::CairoGraph::add_line_styles(const std::vector<CairoGraphLineStyle>& styles)
 {
    //! set the line style of each plot in the series
-   //! Option are CairoGraphLineStyle::SOLID_LINE, DASHED_LINE, DOTS, CIRCLE 
+   //! Options are CairoGraphLineStyle::SOLID_LINE, DASHED_LINE, DOTS, CIRCLE 
 
    serieslinestyle.clear();
    for (auto &i : styles) serieslinestyle.emplace_back(i);
@@ -102,7 +103,7 @@ void CGraph::CairoGraph::set_graph_box_style(const CairoGraphBoxStyle style)
 
 void CGraph::CairoGraph::use_scientific_notation(const bool scientificx, const bool scientificy)
 {
-    //! Use scienfici notation for the x or y axis
+    //! Always use scienfiic notation for the x or y axis
     //! scientificx: if true X axes labels will be displayed in scientific notation
     //! scientificY: if true Y axes labels will be displayed in scientific notation
 
@@ -113,7 +114,7 @@ void CGraph::CairoGraph::use_scientific_notation(const bool scientificx, const b
 void CGraph::CairoGraph::set_tick_label_format_x(const bool showpoint, const int precision)
 {
     //! Override the default behaviour and force the format of axes labels
-    //! showpoint: always show a decimal point if true, the second argument will be ignored
+    //! showpoint: always show a decimal point if true, the second argument will be ignored if true.
     //! precision: Number of decimal places (6 is the maximum ) if showpoint is set to false
 
     if (precision > 6) precisionx = 6;
@@ -125,7 +126,7 @@ void CGraph::CairoGraph::set_tick_label_format_x(const bool showpoint, const int
 void CGraph::CairoGraph::set_tick_label_format_y(const bool showpoint, const int precision)
 {
     //! Override the default behaviour and force the format of axes labels
-    //! showpoint: always show a decimal point if true, the second argument will be ignored
+    //! showpoint: always show a decimal point if true, the second argument will be ignored if true.
     //! precision: Number of decimal places (6 is the maximum ) if showpoint is set to false
 
     if (precision > 6) precisiony = 6;
@@ -165,7 +166,7 @@ void CGraph::CairoGraph::set_legend_scale(const double scale)
 
 void CGraph::CairoGraph::add_multi_legends(const std::vector<Glib::ustring> &legends, const double offsetx, const double offsety)
 {
-    //! used for multi series plots. A vector of legends for 0 to n plots.
+    //! Used for multi series plots. A vector of legends for 0 to n plots.
     //! Displayed at offset x and y, w.r.t. graph top left corner.
     //! if text is empty for any entry it will be skipped, useful for displaying legends for specific plots in a multi series.
 

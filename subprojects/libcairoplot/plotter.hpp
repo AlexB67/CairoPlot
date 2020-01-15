@@ -96,6 +96,9 @@ namespace CGraph
                         const CairoGraphLineStyle style, 
                         bool make_copy = true);
         
+        void init_plots(size_t numplots);
+        void add_point(size_t seriesnum, const double x, const double y, bool update_minmax = true);
+        
         void add_multi_legends(const std::vector<Glib::ustring> &legends, const double offsetx = 0.0, const double offsety = 0.0);
         void add_single_legend(const Glib::ustring &legend, CairoGraphPos pos, const bool showlinecolour);
         void show_legend(const bool show);
@@ -175,23 +178,11 @@ namespace CGraph
         Gdk::RGBA border_colour;
         Cairo::RefPtr<Cairo::LinearGradient> gradient;
         Glib::RefPtr<Gdk::Cursor> cross_hair_cursor;
-        
-        // Single plots
-        std::vector<double> m_xvalues;
-        std::vector<double> m_yvalues;
-        double *m_spx = nullptr; // pointer to X values;
-        double *m_spy = nullptr; // pointer to y values;
-        size_t numpts = 0; // numer of points in single plot 
-        // End single plots
-        
-        // Multi plots
         std::vector<std::vector<double>> seriesx; // multi plots
         std::vector<std::vector<double>> seriesy; // multi plots
         std::vector<double *> m_px; // vector of pointers to plots
         std::vector<double *> m_py; // vector of pointers to plots
-        std::vector<size_t> numpoints; // number of point in each plot
-        // End multi plots
-        
+        std::vector<size_t> numpoints; // number of points in each plot
         std::vector<std::tuple<Glib::ustring, double, double, double, bool> > text_objects;
         Cairo::RefPtr<Cairo::ImageSurface> canvas;
 
@@ -200,7 +191,6 @@ namespace CGraph
         void create_legends(const Cairo::RefPtr<Cairo::Context> &cr);
         void set_font_scale(const double scale, Pango::FontDescription *font, const int h, const int w) const;
         void draw_series(const Cairo::RefPtr<Cairo::Context> &cr);
-        void draw_single_series(const Cairo::RefPtr<Cairo::Context> &cr);
         void set_series_colours();
         void clear_series();
         double x_to_graph_coords(const double x) const;

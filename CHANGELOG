@@ -1,4 +1,6 @@
 - 9/12/2019  v0.0.5
 Optimisation - We now write to a canvas and don't redraw when zooming
-- 14/12020 version v0.0.6
+- 14/1/2020  v0.0.6
 Improvements, support plots by reference and code comments for future docs, support multiple zoom levels.
+- 15/1/2020  v0.0.7
+Improvements, also added a new method for adding graphs point by point for single and multi plots.

@@ -344,7 +344,7 @@ void CairoplotWindow::about()
 
 	aboutdialog.set_logo(Gdk::Pixbuf::create_from_resource("/org/gnome/plotter/plotter.png", 128, 128, true));
 	aboutdialog.set_program_name(_("Cairo plot"));
-	aboutdialog.set_version("0.0.5");
+	aboutdialog.set_version("0.0.7");
 	aboutdialog.set_copyright("Alexander Borro");
 	aboutdialog.set_comments(_("Plotting 2D graphs using Cairomm."));
 	aboutdialog.set_license("GPL v3.0    http://www.gnu.org/licenses");
@@ -372,21 +372,34 @@ void CairoplotWindow::about()
 
 void CairoplotWindow::make_plot()
 {
+	constexpr size_t size = 100;
+	constexpr size_t numplots = 3;
+
+	std::vector<double> t(size);
+	std::vector<double> s(size);
+	std::vector<std::vector<double> > xseries(numplots, t);
+	std::vector<std::vector<double> > yseries(numplots, s);
+
 	double velocity = start_velocity->get_value();
 	double accel = gravitational_constant->get_value();
 	double j = start_time->get_value();
 
 	if ( true == single_series) 
 	{
+		// Example of a single plot point by point
+		graph->init_plots(1);
+
 		for (size_t i = 0; i < size; ++i)
 		{
-			t[i]  = j;
-			a[i]  = velocity + 0.5 * accel * t[i] * t[i];
+			double t_i = j;
+			double s_i = velocity + 0.5 * accel * t_i * t_i;
+			graph->add_point(0, t_i, s_i);
 			j +=  0.25 * 100.0 / 99.0;
 		}
 	}
 	else // multi series
 	{
+		// Example of multiplot with preset data stored in a vector of vectors
 		for (size_t k = 0; k < numplots; ++k)
 		{
 			j = start_time->get_value();
@@ -409,9 +422,14 @@ void CairoplotWindow::make_plot()
 
 	if ( true == single_series ) 
 	{
+		Gdk::RGBA col; col.set_rgba(linecolour->get_color().get_red(),
+									linecolour->get_color().get_blue(), 
+									linecolour->get_color().get_blue(),
+									1.0);
+
+		graph->set_line_colour(0, col);
+
 		Glib::ustring legend = "<i>s</i> = <i>v</i><sub>o</sub> + 0.5(" + Glib::ustring::format(accel) + ")<i>t</i><sup>2</sup>";
-		graph->add_series(t, a, linecolour->get_rgba(), static_cast<CairoGraphLineStyle>(selectlinestyle->get_active_row_number()), false);
-		
 		if (false == hidelegend->get_active()) graph->add_single_legend(legend, CairoGraphPos::LEGEND_TOP, true);
 	}
 	else 
@@ -421,8 +439,9 @@ void CairoplotWindow::make_plot()
 		legends[1] = "<i>s</i> = <i>v</i><sub>o</sub> + 0.5(3.71)<i>t</i><sup>2</sup>";
 		legends[2] = "<i>s</i> = <i>v</i><sub>o</sub> + 0.5(5.55)<i>t</i><sup>2</sup>";
 
-		graph->add_multi_series(xseries, yseries, false);
-		
+		graph->add_multi_series(xseries, yseries); 	// Copy data for the example. 
+												  	// We can also pass by reference with make_copy = false
+
 		if (false == hidelegend->get_active()) graph->add_multi_legends(legends);
 	}
 

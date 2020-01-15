@@ -1,5 +1,5 @@
 project('cairoplot', ['cpp', 'c'], 
-          version: '0.5.0',
+          version: '0.7.0',
     meson_version: '>= 0.50.0',
   default_options: [ 'warning_level=2',
                      'cpp_std=c++17',

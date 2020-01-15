@@ -6,10 +6,10 @@ using namespace CarioGraphConstants;
 
 CGraph::CairoGraph::CairoGraph()
 {   
-    grid    = Gtk::make_managed<Gtk::Grid>();
+    grid        = Gtk::make_managed<Gtk::Grid>();
     cursor_grid = Gtk::make_managed<Gtk::Grid>();
-    xvalue  = Gtk::make_managed<Gtk::Entry>();
-    yvalue  = Gtk::make_managed<Gtk::Entry>();
+    xvalue      = Gtk::make_managed<Gtk::Entry>();
+    yvalue      = Gtk::make_managed<Gtk::Entry>();
     xvaluelabel = Gtk::make_managed<Gtk::Label>();
     yvaluelabel = Gtk::make_managed<Gtk::Label>();
 
@@ -140,11 +140,10 @@ bool CGraph::CairoGraph::on_draw(const Cairo::RefPtr<Cairo::Context> &cr)
         cr->restore();
 
         //  plot data
-        draw_single_series(cr);
         draw_series(cr);
 
          // Axes and labels
-        if (numpts > 1 || numpoints.size() > 0) create_tickmark_labels(cr);
+        if (numpoints.size() > 0) create_tickmark_labels(cr);
 
         create_labels(cr);
 
@@ -261,77 +260,6 @@ void CGraph::CairoGraph::draw_series(const Cairo::RefPtr<Cairo::Context> &cr)
         cr->stroke();
     }
 
-    cr->restore();
-}
-
-void CGraph::CairoGraph::draw_single_series(const Cairo::RefPtr<Cairo::Context> &cr)
-{
-    if(numpts < 2) return;
-
-    cr->set_line_width(lwidth * 0.0025);
-    cr->save();
-    cr->rectangle(OFFSET_X, OFFSET_Y, GRAPH_WIDTH, GRAPH_HEIGHT); 
-    cr->clip();
-
-   if (true == draw_zoom)
-    {   
-        if(plot.zoom_end_x < plot.zoom_start_x) std::swap(plot.zoom_start_x, plot.zoom_end_x);
-        if(plot.zoom_end_y < plot.zoom_start_y) std::swap(plot.zoom_start_y, plot.zoom_end_y);
-
-        cr->translate(OFFSET_X - plot.zoom_start_x / plot.zoom_factor_x, OFFSET_Y - plot.zoom_start_y / plot.zoom_factor_y);
-
-        plot.xmin = xmin + (plot.zoom_start_x - OFFSET_X) * (xmax - xmin) / GRAPH_WIDTH;
-        plot.xmax = xmin + (plot.zoom_end_x - OFFSET_X) * (xmax - xmin) / GRAPH_WIDTH;
-        plot.ymin = ymin + (GRAPH_HEIGHT + OFFSET_Y - plot.zoom_end_y) * (ymax - ymin) / GRAPH_HEIGHT;
-        plot.ymax = ymin + (GRAPH_HEIGHT + OFFSET_Y - plot.zoom_start_y) * (ymax - ymin) / GRAPH_HEIGHT;
-    }
-    else
-    {
-        plot.xmin = xmin;
-        plot.xmax = xmax;
-        plot.ymin = ymin;
-        plot.ymax = ymax;
-    }
-
-    cr->set_source_rgba(seriescolour[0].get_red(), seriescolour[0].get_green(), 
-                        seriescolour[0].get_blue(), seriescolour[0].get_alpha());
-
-    double x = x_to_graph_coords(m_spx[0]) / plot.zoom_factor_x;
-    double y = y_to_graph_coords(m_spy[0]) / plot.zoom_factor_y;
-
-    cr->move_to(x, y);
-
-    if (CairoGraphLineStyle::DASHED_LINE == serieslinestyle[0])
-        cr->set_dash(dashes3, 0);
-
-    if (CairoGraphLineStyle::CIRCLE == serieslinestyle[0])
-        cr->arc(x, y, 0.002, 0.0, 2 * M_PI);
-
-    if (CairoGraphLineStyle::DOTS == serieslinestyle[0])
-        cr->arc(x, y, 0.0005, 0.0, 2 * M_PI);
-
-    for (size_t i = 1; i < numpts; ++i)
-    {
-        x = x_to_graph_coords(m_spx[i]) / plot.zoom_factor_x;
-        y = y_to_graph_coords(m_spy[i]) / plot.zoom_factor_y;
-
-        if (CairoGraphLineStyle::SOLID_LINE == serieslinestyle[0] || CairoGraphLineStyle::DASHED_LINE == serieslinestyle[0])
-        {
-            cr->line_to(x, y);
-        }
-        else if (CairoGraphLineStyle::CIRCLE == serieslinestyle[0])
-        {
-            cr->move_to(x, y);
-            cr->arc(x, y, 0.002, 0.0, 2 * M_PI);
-        }
-        else if (CairoGraphLineStyle::DOTS == serieslinestyle[0])
-        {
-            cr->move_to(x, y);
-            cr->arc(x, y, 0.0005, 0.0, 2 * M_PI);
-        }
-    }
-
-    cr->stroke();
     cr->restore();
 }
 
