@@ -52,7 +52,7 @@ bool CGraph::CairoGraph::on_button_release_event(GdkEventButton *event)
         selection_mode = false;      
         
         // save guard the user double click and too small a region selected
-        if (plot.zoom_factor_x < 0.0001 || plot.zoom_factor_x < 0.0001) return true;
+        if (plot.zoom_factor_x < 0.00001 || plot.zoom_factor_y < 0.00001) return true;
     }
     else if (event->type == GDK_BUTTON_RELEASE && event->button == 3)
     {

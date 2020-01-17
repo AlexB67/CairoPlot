@@ -42,6 +42,8 @@ void CGraph::CairoGraph::create_tickmark_labels(const Cairo::RefPtr<Cairo::Conte
     else if (precisiony > 0 && false == showpointy) // formatted to width
     {
         int precision = precisiony + static_cast<int>(log10(1.0 / plot.zoom_factor_y));
+        if (precision > 6) precision = 6;
+
         labely[0] = Glib::ustring::format(std::fixed, std::setprecision(precision),  plot.ymax);
         labely[1] = Glib::ustring::format(std::fixed, std::setprecision(precision),  plot.ymin + 0.75 * (plot.ymax - plot.ymin));
         labely[2] = Glib::ustring::format(std::fixed, std::setprecision(precision),  plot.ymin + 0.50 * (plot.ymax - plot.ymin));
@@ -143,6 +145,8 @@ void CGraph::CairoGraph::create_tickmark_labels(const Cairo::RefPtr<Cairo::Conte
     else if (precisionx > 0 && false == showpointx) // formatted to width
     {
         int precision = precisionx + static_cast<int>(log10(1.0 / plot.zoom_factor_x));
+        if (precision > 6) precision = 6;
+        
         labelx[0] = Glib::ustring::format(std::fixed, std::setprecision(precision),  plot.xmax);
         labelx[1] = Glib::ustring::format(std::fixed, std::setprecision(precision),  plot.xmin + 0.75 * (plot.xmax - plot.xmin));
         labelx[2] = Glib::ustring::format(std::fixed, std::setprecision(precision),  plot.xmin + 0.50 * (plot.xmax - plot.xmin));
