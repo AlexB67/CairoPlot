@@ -19,7 +19,7 @@ CGraph::CairoGraph::CairoGraph()
     cross_hair_cursor = Gdk::Cursor::create(display, Gdk::CROSSHAIR); // graph cursor
     
     bg_colour1.set_rgba(0.0, 0.0, 0.0, 1.0); //  default background gradient
-    bg_colour2.set_rgba(0.28, 0.28, 0.28, 1.0); // default background gradient
+    bg_colour2.set_rgba(0.0, 0.0, 0.0, 1.0); // default background gradient
     axes_colour.set_rgba(1.0, 1.0, 1.0, 0.80);
     graphboxstyle = CairoGraphBoxStyle::BOX_GRID; // default graph style
     
