@@ -26,4 +26,5 @@ libcairoplot = static_library('cairoplot',
   install : false)
 
 libcairoplot_dep = declare_dependency(include_directories : inc,
+  cpp_args : ['-Wall', '-Wextra', '-pedantic'],
   link_with : libcairoplot)

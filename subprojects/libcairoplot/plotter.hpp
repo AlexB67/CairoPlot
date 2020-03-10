@@ -24,7 +24,7 @@ namespace CarioGraphConstants
     constexpr int start_height = 256;
     constexpr int start_width = 256;
 
-}; // namespace CarioGraphConstants
+} // namespace CarioGraphConstants
 
 enum class CairoGraphLineStyle
 {

@@ -112,7 +112,7 @@ void CGraph::CairoGraph::create_tickmark_labels(const Cairo::RefPtr<Cairo::Conte
     }
     else
     {
-        size_t j = 0;
+        j = 0;
         double offset = 0.0;
         for (auto &i : exponenty)
         {
@@ -215,7 +215,7 @@ void CGraph::CairoGraph::create_tickmark_labels(const Cairo::RefPtr<Cairo::Conte
     }
     else
     {
-        size_t j = 0;
+        j = 0;
         x_step = GRAPH_WIDTH;
         for (auto &i : exponentx)
         {

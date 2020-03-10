@@ -17,6 +17,6 @@ cairoplot_sources += gnome.compile_resources('cairoplot-resources',
 executable('cairoplot', cairoplot_sources,
   dependencies: [cairoplot_gtkmmdeps, libcairoplot_dep],
   override_options : ['cpp_std=c++17'],
-  cpp_args : '-Wl, -Wall, -Wextra -Wshadow',
+  cpp_args : ['-Wall', '-Wextra', '-pedantic'],
   install: true,
 )
