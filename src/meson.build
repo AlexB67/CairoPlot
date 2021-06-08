@@ -4,7 +4,7 @@ cairoplot_sources = [
 ]
 
 cairoplot_gtkmmdeps = [
-  dependency('gtkmm-3.0', version: '>= 3.18'),
+  dependency('gtkmm-4.0', version: '>= 4.0.0'),
 ]
 
 gnome = import('gnome')

@@ -1,5 +1,6 @@
 #include "plotter.hpp"
-#include <iostream>
+#include <gtkmm/cssprovider.h>
+#include <gtkmm/settings.h>
 
 const Glib::ustring& CGraph::CairoGraph::get_theme_name() const 
 {   
@@ -19,55 +20,81 @@ void CGraph::CairoGraph::set_theme(const Glib::ustring& theme, bool automatic)
     //! Supported themes are 
     //! "Fade to black", "Herculean blue", "Black", "Midnight blue", "Dark", "Default"
 
-    if ( "Fade to black" == theme)
+    if ("Fade to black" == theme)
     {
         current_theme = theme;
         axes_colour.set_rgba(1.0, 1.0, 1.0, 0.80);
         bg_colour1.set_rgba(0.0, 0.0, 0.0, 1.0);
         bg_colour2.set_rgba(0.28, 0.28, 0.28, 1.0);
+        return;
     }
-    else if ( "Herculean blue" == theme)
+    else if ("Herculean blue" == theme)
     {
         current_theme = theme;
         axes_colour.set_rgba(1.0, 1.0, 1.0, 0.80);
         bg_colour1.set_rgba(16.0 / 255.0, 29.0 / 255.0, 53.0 / 255.0, 1.0);
         bg_colour2.set_rgba(5.0 / 255.0, 95.00 / 255.0, 134.0 / 255.0, 1.0);
+        return;
     }
-    else if ( "Black" == theme)
+    else if ("Black" == theme)
     {
         current_theme = theme;
         axes_colour.set_rgba(1.0, 1.0, 1.0, 0.80);
         bg_colour1.set_rgba(0.0, 0.0, 0.0, 1.0);
         bg_colour2.set_rgba(0.0, 0.0, 0.0, 1.0);
+        return;
     }
-    else if ( "Midnight blue" == theme)
+    else if ("Midnight blue" == theme)
     {
         current_theme = theme;
         axes_colour.set_rgba(1.0, 1.0, 1.0, 0.80);
         bg_colour1.set_rgba(0.1, 0.1, 0.1, 1.0);
         bg_colour2.set("midnight blue");
+        return;
     }
-    else if ( "Dark" ==  theme)
+    else if ("Dark" ==  theme)
     {
         current_theme = theme;
         axes_colour.set_rgba(1.0, 1.0, 1.0, 0.80);
      	bg_colour1.set_rgba(19.0 / 255.0, 19.0 / 255.0, 25.0 / 255.0, 1.0);
 		bg_colour2.set_rgba(46.0 / 255.0, 48.0 / 255.0, 58.0 / 255.0, 1.0);
+        return;
     }
     else if ("Default" ==  theme)
     {
         // get the colours from the system theme
         current_theme = "Default";
-        auto context = xvalue->get_style_context();
+        const auto context = xvalue->get_style_context();
         axes_colour.set(context->get_color().to_string());
-     	bg_colour1.set(context->get_background_color().to_string());
-		bg_colour2.set(context->get_background_color().to_string());
 
-        // doesn't look good with many themes so reserve this for adwaita
-        if( Gtk::Settings::get_default()->property_gtk_theme_name().get_value() == "Adwaita" || 
-            Gtk::Settings::get_default()->property_gtk_theme_name().get_value() == "Adwaita-dark")
-            border_colour = context->get_border_color();
-        else border_colour.set_rgba(0.0, 0.0, 0.0, 0.33);
+        if(Gtk::Settings::get_default()->property_gtk_theme_name().get_value() != "Adwaita"
+           && Gtk::Settings::get_default()->property_gtk_theme_name().get_value() != "Adwaita-dark")
+        {
+            bg_colour1.set_alpha(0.0);
+            bg_colour2.set_alpha(0.0);
+            border_colour.set_rgba(0.05, 0.05, 0.05, 0.333);
+            return;
+        }
+        
+        else if(Gtk::Settings::get_default()->property_gtk_theme_name().get_value() == "Adwaita-dark"
+          || Gtk::Settings::get_default()->property_gtk_application_prefer_dark_theme().get_value() == true)
+        {
+            bg_colour1.set_rgba(0.176, 0.176, 0.176, 1.0);
+            bg_colour2 = bg_colour1;
+            border_colour.set_rgba(0.05, 0.05, 0.05, 1.0);
+            return;
+        }
+        else if (Gtk::Settings::get_default()->property_gtk_theme_name().get_value() == "Adwaita")
+        {
+            bg_colour1.set_rgba(0.99, 0.99, 0.99, 1.0);
+            bg_colour2 = bg_colour1;
+            border_colour.set_rgba(0.05, 0.05, 0.05, 0.333);
+            return;
+        }
+        // fall through mixing gtk4 && 3 is a mess, it can happen
+        bg_colour1.set_alpha(0.0);
+        bg_colour2.set_alpha(0.0);
+        border_colour.set_rgba(0.05, 0.05, 0.05, 0.333);
     }
     else
     {

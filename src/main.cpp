@@ -18,34 +18,8 @@
 
 #include "cairoplot-window.hpp"
 
-Gtk::Window *window;
-
-static void
-on_activate (Glib::RefPtr<Gtk::Application> app)
-{
-	window = app->get_active_window();
-
-	if (!window) {
-		window = new CairoplotWindow(app);
-		window->property_application() = app;
-		window->property_default_width() =  980;
-		window->property_default_height() = 680;
-		app->add_window(*window);
-	}
-
-	window->present();
-}
-
 int main (int argc, char *argv[])
 {
-	int ret;
-
-	Glib::RefPtr<Gtk::Application> app =
-		Gtk::Application::create("org.gnome.plotter", Gio::APPLICATION_FLAGS_NONE);
-
-	app->signal_activate().connect(sigc::bind(&on_activate, app));
-
-	ret = app->run(argc, argv);
-	delete window;
-	return ret;
+	auto app = Gtk::Application::create("org.gnome.plotter");
+	return app->make_window_and_run<CairoplotWindow>(argc, argv, app);
 }

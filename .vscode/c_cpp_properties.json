@@ -50,7 +50,8 @@
                 "/usr/include/webkitgtk-4.0",
                 "/usr/include/webkitgtk-4.0/webkit2",
                 "/usr/include/libsoup-2.4",
-                "${workspaceFolder}/build/src"
+                "${workspaceFolder}/build/src",
+                "/usr/lib64/atkmm-1.6/include"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/g++",

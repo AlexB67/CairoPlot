@@ -3,8 +3,14 @@
 #include <gdkmm/general.h>
 #include <cairomm/context.h>
 #include <gtkmm/drawingarea.h>
-#include <gtkmm.h>
 #include <glibmm.h>
+#include <gtkmm/entry.h>
+#include <gtkmm/grid.h>
+#include <gtkmm/label.h>
+#include <gtkmm/eventcontrollermotion.h>
+#include <gtkmm/gesture.h>
+#include <gtkmm/gestureclick.h>
+#include <gdk/gdkkeysyms.h>
 #include <cairomm/cairomm.h>
 #include <gtkmm/window.h>
 #include <glibmm/i18n.h>
@@ -82,7 +88,10 @@ namespace CGraph
         void set_line_width(const double linewidth);
         void set_background_colour(const Gdk::RGBA colour1, const Gdk::RGBA colour2);
         void set_background_colour(const Gdk::RGBA colour1);
-        void set_axes_labels(const Glib::ustring &xlabel, const Glib::ustring &ylabel, Glib::ustring fontfamily = _("Nimbus Roman"));
+
+        void set_axes_labels(const Glib::ustring &xlabel, const Glib::ustring &ylabel, 
+                            Glib::ustring fontfamily = _("Nimbus Roman"));
+        
         void set_tick_label_format_x(const bool showpointx, const int precision);
         void set_tick_label_format_y(const bool showpointy, const int precision);
 
@@ -197,16 +206,20 @@ namespace CGraph
         double y_to_graph_coords(const double y) const;
 
         //events
-        bool on_draw(const Cairo::RefPtr<Cairo::Context> &cr) override;
-        bool on_button_press_event(GdkEventButton *event) override;
-        bool on_button_release_event(GdkEventButton *event) override;
-        bool on_motion_notify_event(GdkEventMotion *event) override;
-    // bool on_leave_notify_event(GdkEventCrossing *event) override;
+        // bool on_button_press_event(GdkEventButton *event) override;
+        // bool on_button_release_event(GdkEventButton *event) override;
+        void on_button_release_event(int, double, double);
+        void on_button_press_event(int, double, double);
+        void reset_event(int, double, double);
+        void on_motion_notify_event(double width, double height);
+
 
     protected:
-        virtual void get_preferred_width_vfunc(int &minimum_width, int &natural_width) const override;
-        virtual void get_preferred_height_vfunc(int &minimum_height, int &natural_height) const override;
-        virtual void get_preferred_width_for_height_vfunc(int, int &minimum_width, int &natural_width) const override;
-        virtual void get_preferred_height_for_width_vfunc(int, int &minimum_height, int &natural_height) const override;
+        void on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int, int);
+       // virtual void set_content_height(int height) const override;
+        //virtual void get_preferred_width_vfunc(int &minimum_width, int &natural_width) const;
+        // virtual void get_preferred_height_vfunc(int &minimum_height, int &natural_height) const;
+        // virtual void get_preferred_width_for_height_vfunc(int, int &minimum_width, int &natural_width) const;
+        // virtual void get_preferred_height_for_width_vfunc(int, int &minimum_height, int &natural_height) const;
     };
 }

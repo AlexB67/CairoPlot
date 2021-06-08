@@ -27,11 +27,11 @@ CairoplotWindow::CairoplotWindow(const Glib::RefPtr<Gtk::Application>& app)
 	, m_app(app)
 {	
 	Gtk::Settings::get_default()->property_gtk_application_prefer_dark_theme().set_value(true);
-
+	
 	create_header_and_menus();
 
 	graphframe.set_label(_("Graph"));
-	graphframe.set_label_align(Gtk::ALIGN_CENTER, Gtk::ALIGN_CENTER);
+	graphframe.set_label_align(Gtk::Align::CENTER);
 	graphframe.set_hexpand(true);
 
 	graph = Gtk::make_managed<CGraph::CairoGraph>();
@@ -43,30 +43,31 @@ CairoplotWindow::CairoplotWindow(const Glib::RefPtr<Gtk::Application>& app)
 	start_time = Gtk::make_managed<Gtk::SpinButton>();
 	sep = Gtk::make_managed<Gtk::Separator>();
 	setscifiy = Gtk::make_managed<Gtk::Switch>();
-	setscifiy->set_halign(Gtk::ALIGN_END);
-	setscifiy->set_valign(Gtk::ALIGN_CENTER);
+	setscifiy->set_halign(Gtk::Align::END);
+	setscifiy->set_valign(Gtk::Align::CENTER);
 	setscifiy->set_active(false);
-	setscifiylabel = Gtk::make_managed<Gtk::Label>("Y axis exp.", Gtk::ALIGN_END);
+	setscifiylabel = Gtk::make_managed<Gtk::Label>("Y axis exp.", Gtk::Align::END);
 	setscifix = Gtk::make_managed<Gtk::Switch>();
-	setscifix->set_halign(Gtk::ALIGN_END);
-	setscifix->set_valign(Gtk::ALIGN_CENTER);
+	setscifix->set_halign(Gtk::Align::END);
+	setscifix->set_valign(Gtk::Align::CENTER);
 	setscifix->set_active(false);
 	hidelegend = Gtk::make_managed<Gtk::Switch>();
-	hidelegend->set_halign(Gtk::ALIGN_END);
-	hidelegend->set_valign(Gtk::ALIGN_CENTER);
+	hidelegend->set_halign(Gtk::Align::END);
+	hidelegend->set_valign(Gtk::Align::CENTER);
 	hidelegend->set_active(false);
-	hidelegend_label = Gtk::make_managed<Gtk::Label>("Hide legend", Gtk::ALIGN_END);
-	setscifixlabel = Gtk::make_managed<Gtk::Label>("X axis exp.", Gtk::ALIGN_END);
-	linecolourlabel = Gtk::make_managed<Gtk::Label>("Line colour", Gtk::ALIGN_END);
-	start_timelabel = Gtk::make_managed<Gtk::Label>("", Gtk::ALIGN_END);
-	graphboxstyle_label = Gtk::make_managed<Gtk::Label>("Graph style", Gtk::ALIGN_END);
+	hidelegend_label = Gtk::make_managed<Gtk::Label>("Hide legend", Gtk::Align::END);
+	setscifixlabel = Gtk::make_managed<Gtk::Label>("X axis exp.", Gtk::Align::END);
+	linecolourlabel = Gtk::make_managed<Gtk::Label>("Line colour", Gtk::Align::END);
+	start_timelabel = Gtk::make_managed<Gtk::Label>("", Gtk::Align::END);
+	graphboxstyle_label = Gtk::make_managed<Gtk::Label>("Graph style", Gtk::Align::END);
 	linecolour = Gtk::make_managed<Gtk::ColorButton>();
-	selectlinestylelabel = Gtk::make_managed<Gtk::Label>("Line style", Gtk::ALIGN_END);
+	selectlinestylelabel = Gtk::make_managed<Gtk::Label>("Line style", Gtk::Align::END);
 	selectlinestyle = Gtk::make_managed<Gtk::ComboBoxText>();
 	graphboxstyle = Gtk::make_managed<Gtk::ComboBoxText>();
 
-	graphframe.add(graph->create_graph());
-	graph->get_graph_grid().set_border_width(10);
+	//graphframe.add(graph->create_graph());
+	graphframe.set_child(graph->create_graph());
+	graph->get_graph_grid().set_margin(10);
 	graph->set_title(_("Displacement versus time"));
 	
 	selectlinestyle->insert(0, "Solid line");
@@ -148,7 +149,8 @@ CairoplotWindow::CairoplotWindow(const Glib::RefPtr<Gtk::Application>& app)
 	selecttheme->insert(5, _("Desktop theme"));
 	selecttheme->set_tooltip_text("Determines the graph colours. The default uses desktop theme colours.");
 
-	sizegroup = Gtk::SizeGroup::create(Gtk::SIZE_GROUP_HORIZONTAL);
+	// sizegroup = Gtk::SizeGroup::create(Gtk::SIZE_GROUP_HORIZONTAL);
+	sizegroup = Gtk::SizeGroup::create(Gtk::SizeGroup::Mode::HORIZONTAL);
 	sizegroup->add_widget(*selectgraph);
 	sizegroup->add_widget(*selecttheme);
 	sizegroup->add_widget(*start_velocity);
@@ -204,6 +206,10 @@ CairoplotWindow::CairoplotWindow(const Glib::RefPtr<Gtk::Application>& app)
 		graph->update_graph();
 	});
 	
+	Gtk::Settings::get_default()->property_gtk_theme_name().signal_changed().connect([this](){
+		graph->set_theme("Default");
+		graph->update_graph();
+	});
 
 	// create a graph and connect signals
 
@@ -226,9 +232,9 @@ CairoplotWindow::CairoplotWindow(const Glib::RefPtr<Gtk::Application>& app)
 	// add the graph
 
 	gravitational_constant_label.set_markup(_("<i>g</i> / m s<sup>-2</sup>"));
-	gravitational_constant_label.set_halign(Gtk::ALIGN_END);
+	gravitational_constant_label.set_halign(Gtk::Align::END);
 	start_velocity_label.set_markup(_("<i>v</i><sub>o</sub> / m s<sup>-1</sup>"));
-	start_velocity_label.set_halign(Gtk::ALIGN_END);
+	start_velocity_label.set_halign(Gtk::Align::END);
 	start_timelabel->set_markup(_("<i>t</i><sub>o</sub> / s"));
 
 	gravitational_constant->set_digits(4);
@@ -236,30 +242,30 @@ CairoplotWindow::CairoplotWindow(const Glib::RefPtr<Gtk::Application>& app)
 	gravitational_constant->set_range(0.01, 50.0);
 	gravitational_constant->set_increments(0.1, 0.5);
 	gravitational_constant->set_value(9.8100);
-	gravitational_constant->set_halign(Gtk::ALIGN_CENTER);
+	gravitational_constant->set_halign(Gtk::Align::CENTER);
 
 	start_velocity->set_digits(4);
 	start_velocity->set_numeric(true);
 	start_velocity->set_range(0.0, 1000.0);
 	start_velocity->set_increments(0.1, 1.0);
 	start_velocity->set_value(100.0000);
-	start_velocity->set_halign(Gtk::ALIGN_CENTER);
+	start_velocity->set_halign(Gtk::Align::CENTER);
 
 	start_time->set_digits(4);
 	start_time->set_numeric(true);
 	start_time->set_range(0.0, 1000.0);
 	start_time->set_increments(0.1, 1.0);
 	start_time->set_value(10.0000);
-	start_time->set_halign(Gtk::ALIGN_CENTER);
+	start_time->set_halign(Gtk::Align::CENTER);
 
 	grid.set_column_spacing(10);
 	grid.set_row_spacing(10);
-	grid.set_border_width(10);
+	grid.set_margin(10);
 	grid.attach(graphframe, 0, 0, 4, 1);
 
 	controlgrid.set_row_spacing(20);
 	controlgrid.set_column_spacing(10);
-	controlgrid.set_border_width(10);
+	controlgrid.set_margin(10);
 	controlgrid.attach(selectgraphlabel, 0, 0);
 	controlgrid.attach(*selectgraph, 1, 0);
 	controlgrid.attach(selectthemelabel, 0, 1);
@@ -285,21 +291,19 @@ CairoplotWindow::CairoplotWindow(const Glib::RefPtr<Gtk::Application>& app)
 	controlgrid.attach(*gravitational_constant, 1, 11);
 
 	graphcontrolframe.set_label(_("Graph controls"));
-	graphcontrolframe.set_label_align(Gtk::ALIGN_CENTER, Gtk::ALIGN_CENTER);
-	graphcontrolframe.set_border_width(10);
-	graphcontrolframe.add(controlgrid);
+	graphcontrolframe.set_label_align(Gtk::Align::CENTER);
+	graphcontrolframe.set_margin(10);
+	graphcontrolframe.set_child(controlgrid);
 
 	maingrid.attach(grid, 0, 0);
 	maingrid.attach(graphcontrolframe, 1, 0);
-	add(maingrid);
-
-	show_all_children();
+	set_child(maingrid);
 	selecttheme->set_active(3);
 	selectlinestyle->set_active(0);
 	graphboxstyle->set_active(0);
 	selectgraph->set_active(0);
 	selectgraph->grab_focus();
-
+	
     auto note = Gio::Notification::create(_("cairoplot"));
     note->set_body("Welcome to Cairo plotting");
     m_app->send_notification(_("Cairo Graphs"), note);
@@ -308,14 +312,27 @@ CairoplotWindow::CairoplotWindow(const Glib::RefPtr<Gtk::Application>& app)
 void CairoplotWindow::create_header_and_menus()
 {
 	set_titlebar(headerbar);
-	headerbar.set_show_close_button(true);
-	headerbar.set_title(_("2D Graphs Demo - gtkmm & cariomm"));
-	menubutton.set_image_from_icon_name("open-menu-symbolic", Gtk::ICON_SIZE_BUTTON, true);
+	//headerbar.set_show_close_button(true);
+	headerbar.set_show_title_buttons(true);
+	// headerbar.set_title(_("2D Graphs Demo - gtkmm & cariomm"));
+
+	// menubutton.set_image_from_icon_name("open-menu-symbolic", Gtk::ICON_SIZE_BUTTON, true);
+	menubutton.set_icon_name("open-menu-symbolic");
    	menubutton.set_tooltip_text(_("Opens the menu."));
 	headerbar.pack_end(menubutton);
-	headerbar.show();
-	winmenu = Gio::Menu::create();
+	preferdark = Gtk::make_managed<Gtk::Switch>();
+	preferdark->set_tooltip_text("Enable or disable the \"Prefer dark theme\" option.");
+	headerbar.pack_end(*preferdark);
+	preferdark->set_active();
 
+	preferdark->property_active().signal_changed().connect([this](){
+		Gtk::Settings::get_default()->property_gtk_application_prefer_dark_theme().set_value(preferdark->get_active());
+		graph->set_theme("Default");
+		graph->update_graph();
+		selecttheme->set_active(5);
+	});
+
+	winmenu = Gio::Menu::create();
 	winmenu->append(_("_About"), "win.about");
 	winmenu->append(_("_Help"), "win.help");
 	winmenu->append(_("_Quit"), "win.quit");
@@ -324,50 +341,56 @@ void CairoplotWindow::create_header_and_menus()
 
 	m_app->set_accel_for_action("win.quit", "<Ctrl>q");
 
-
 	add_action("help", [this](){
-		Glib::ustring message;
-		message = _("To zoom in hold down the left mouse button and drag out a rectanglular area, then release. Right click resets. "  
-					"Use the controls on the right to change graph properties.");
-		Gtk::MessageDialog message_dialog(message, true, Gtk::MESSAGE_INFO, Gtk::BUTTONS_CLOSE, true);
-    	message_dialog.run();
+    	help_dialog->show();
+		help_dialog->present();
 	});
 
 	add_action("quit", sigc::mem_fun(*this, &CairoplotWindow::close));
-	add_action("about", sigc::mem_fun(*this,&CairoplotWindow::about));
+
+	about();
+	add_action("about", [this](){
+		aboutdialog->show();
+		aboutdialog->present();
+	});
+
+	Glib::ustring message
+	= _("To zoom in hold down the left mouse button and drag out a rectanglular area, then release. Right click resets. "  
+		"Use the controls on the right to change graph properties.");
+		Glib::ustring title
+	= _("Graph Zoom");
+
+	help_dialog = std::make_unique<Gtk::MessageDialog>(title, true, Gtk::MessageType::INFO, Gtk::ButtonsType::CLOSE, false);
+	help_dialog->set_transient_for(*this);
+	help_dialog->set_secondary_text(message);
+	help_dialog->set_modal(true);
+	help_dialog->signal_response().connect(
+    sigc::hide([this](){help_dialog->hide();}));
 }
 
 void CairoplotWindow::about()
 {
-	Gtk::AboutDialog aboutdialog;
-	aboutdialog.set_transient_for(*this);
+	aboutdialog = std::make_unique<Gtk::AboutDialog>();
+	aboutdialog->set_transient_for(*this);
+	aboutdialog->set_hide_on_close();
+	aboutdialog->set_modal(true);
 
-	aboutdialog.set_logo(Gdk::Pixbuf::create_from_resource("/org/gnome/plotter/plotter.png", 128, 128, true));
-	aboutdialog.set_program_name(_("Cairo plot"));
-	aboutdialog.set_version("0.0.7");
-	aboutdialog.set_copyright("Alexander Borro");
-	aboutdialog.set_comments(_("Plotting 2D graphs using Cairomm."));
-	aboutdialog.set_license("GPL v3.0    http://www.gnu.org/licenses");
-	aboutdialog.set_website("http://www.gtkmm.org");
-	aboutdialog.set_website_label("gtkmm website");
+	// aboutdialog.set_logo(Gdk::Pixbuf::create_from_resource("/org/gnome/plotter/plotter.png", 128, 128, true));
+	
+	aboutdialog->set_logo(Gdk::Texture::create_for_pixbuf(Gdk::Pixbuf::create_from_resource
+	("/org/gnome/plotter/plotter.png", 128, 128, true)));
+	
+	aboutdialog->set_program_name(_("Cairo plot"));
+	aboutdialog->set_version("0.2.0");
+	aboutdialog->set_copyright("Alexander Borro");
+	aboutdialog->set_comments(_("Plotting 2D graphs using gtkmm-4.0 and Cairomm-1.16."));
+	aboutdialog->set_license("GPL v3.0    http://www.gnu.org/licenses");
+	aboutdialog->set_website("http://www.gtkmm.org");
+	aboutdialog->set_website_label("gtkmm website");
 
 	std::vector<Glib::ustring> list_authors;
-	list_authors.push_back("Alexander Borro");
-	aboutdialog.set_authors(list_authors);
-	const int id = aboutdialog.run();
-	aboutdialog.present();
-
-	switch (id)
-	{
-	case Gtk::RESPONSE_OK:
-	case Gtk::RESPONSE_CLOSE:
-	case Gtk::RESPONSE_CANCEL:
-	case Gtk::RESPONSE_DELETE_EVENT:
-		aboutdialog.hide();
-		break;
-	default:
-		break;
-	}
+	list_authors.emplace_back("Alexander Borro");
+	aboutdialog->set_authors(list_authors);
 }
 
 void CairoplotWindow::make_plot()
@@ -420,12 +443,15 @@ void CairoplotWindow::make_plot()
 	graph->set_tick_label_format_y(false, 2);
 	graph->set_axes_labels(_("<i>t</i> / s"), _("<i>s</i> / m"));
 
-	if ( true == single_series ) 
+	if (true == single_series) 
 	{
-		Gdk::RGBA col; col.set_rgba(linecolour->get_color().get_red(),
-									linecolour->get_color().get_blue(), 
-									linecolour->get_color().get_blue(),
-									1.0);
+		// Gdk::RGBA col; col.set_rgba(linecolour->get_color().get_red(),
+		// 							linecolour->get_color().get_blue(), 
+		// 							linecolour->get_color().get_blue(),
+		// 							1.0);
+		Gdk::RGBA col; col.set_rgba(linecolour->get_rgba().get_red(),
+		                            linecolour->get_rgba().get_blue(),
+									linecolour->get_rgba().get_green(), 1.0);
 
 		graph->set_line_colour(0, col);
 

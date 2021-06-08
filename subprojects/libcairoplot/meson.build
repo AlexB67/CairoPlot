@@ -1,5 +1,5 @@
 project('libcairoplot',  'cpp', 
-          version: '0.0.7',
+          version: '0.2.0',
     meson_version: '>= 0.50.0',
   default_options: [ 'warning_level=2',
                      'cpp_std=c++17',
@@ -8,7 +8,7 @@ project('libcairoplot',  'cpp',
 
 
 gtkmmdeps = [
-  dependency('gtkmm-3.0', version: '>= 3.18'),
+  dependency('gtkmm-4.0', version: '>= 4.00'),
 ]
 
 inc = include_directories('.')
@@ -26,5 +26,5 @@ libcairoplot = static_library('cairoplot',
   install : false)
 
 libcairoplot_dep = declare_dependency(include_directories : inc,
-  cpp_args : ['-Wall', '-Wextra', '-pedantic'],
+  compile_args : ['-Wall', '-Wextra', '-pedantic', '-Wno-overlength-strings'], # shut up gresource
   link_with : libcairoplot)

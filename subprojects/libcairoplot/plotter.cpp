@@ -6,6 +6,12 @@ using namespace CarioGraphConstants;
 
 CGraph::CairoGraph::CairoGraph()
 {   
+  
+    set_content_width(580);
+    set_content_height(512);
+
+    set_draw_func(sigc::mem_fun(*this, &CairoGraph::on_draw));
+
     grid        = Gtk::make_managed<Gtk::Grid>();
     cursor_grid = Gtk::make_managed<Gtk::Grid>();
     xvalue      = Gtk::make_managed<Gtk::Entry>();
@@ -13,20 +19,33 @@ CGraph::CairoGraph::CairoGraph()
     xvaluelabel = Gtk::make_managed<Gtk::Label>();
     yvaluelabel = Gtk::make_managed<Gtk::Label>();
 
-    add_events( Gdk::POINTER_MOTION_MASK | Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK);
-
     auto display = Gdk::Display::get_default();
-    cross_hair_cursor = Gdk::Cursor::create(display, Gdk::CROSSHAIR); // graph cursor
+    cross_hair_cursor = Gdk::Cursor::create("crosshair"); // graph cursor
     
     bg_colour1.set_rgba(0.0, 0.0, 0.0, 1.0); //  default background gradient
     bg_colour2.set_rgba(0.0, 0.0, 0.0, 1.0); // default background gradient
     axes_colour.set_rgba(1.0, 1.0, 1.0, 0.80);
     graphboxstyle = CairoGraphBoxStyle::BOX_GRID; // default graph style
+
+    auto motionctrl = Gtk::EventControllerMotion::create();
+    motionctrl->signal_motion().connect(sigc::mem_fun(*this, &CairoGraph::on_motion_notify_event));
+    add_controller(motionctrl);
+
+    auto buttonctrl =  Gtk::GestureClick::create();
+    buttonctrl->set_button(1);
+    buttonctrl->signal_pressed().connect(sigc::mem_fun(*this, &CairoGraph::on_button_press_event));
+    buttonctrl->signal_released().connect(sigc::mem_fun(*this, &CairoGraph::on_button_release_event));
+    add_controller(buttonctrl);
+
+    auto resetctrl =  Gtk::GestureClick::create();
+    resetctrl->set_button(3);
+    resetctrl->signal_pressed().connect(sigc::mem_fun(*this, &CairoGraph::reset_event));
+    add_controller(resetctrl);
     
     set_size_request(start_height, start_height);
 }
 
-bool CGraph::CairoGraph::on_draw(const Cairo::RefPtr<Cairo::Context> &cr)
+void CGraph::CairoGraph::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int, int)
 {
     Gtk::Allocation allocation = get_allocation();
     const int w = allocation.get_width();
@@ -42,18 +61,21 @@ bool CGraph::CairoGraph::on_draw(const Cairo::RefPtr<Cairo::Context> &cr)
     if (selection_mode == false)
     {
         // we create a surface to write on and restore it when zooming
-        // instead of redrawing eveything
+        // instead of redrawing everything
         cr->save();
         cr->scale(1.0 / w, 1.0 / h);
-        canvas.clear(); // needed ?
-        canvas = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, w, h);
+
+        //canvas.clear();
+        canvas = Cairo::ImageSurface::create(Cairo::Surface::Format::ARGB32, w, h); // 4.0
         auto context = Cairo::Context::create(canvas);
         cr->restore();
         gradient = Cairo::LinearGradient::create(0.0, 0.0, 0.0, 1.0);
 
         // Set grandient colors
-        gradient->add_color_stop_rgba(0.0, bg_colour1.get_red(), bg_colour1.get_green(), bg_colour1.get_blue(), bg_colour1.get_alpha());
-        gradient->add_color_stop_rgba(1.0, bg_colour2.get_red(), bg_colour2.get_green(), bg_colour2.get_blue(), bg_colour2.get_alpha());
+        gradient->add_color_stop_rgba(0.0, bg_colour1.get_red(), bg_colour1.get_green(), bg_colour1.get_blue(), 
+                                      bg_colour1.get_alpha());
+        gradient->add_color_stop_rgba(1.0, bg_colour2.get_red(), bg_colour2.get_green(), bg_colour2.get_blue(), 
+                                      bg_colour2.get_alpha());
 
         // draw gradient
         cr->set_source(gradient);
@@ -63,7 +85,7 @@ bool CGraph::CairoGraph::on_draw(const Cairo::RefPtr<Cairo::Context> &cr)
         // Draw axes and gridlines
         cr->save();
         cr->scale(1.0 / w, 1.0 / h);
-        cr->set_line_join(Cairo::LINE_JOIN_ROUND);
+        cr->set_line_join(Cairo::Context::LineJoin::ROUND);
         cr->set_source_rgba(axes_colour.get_red(), axes_colour.get_green(), axes_colour.get_blue(), axes_colour.get_alpha());
         cr->set_line_width(BOX_LINEWIDTH);
 
@@ -84,7 +106,8 @@ bool CGraph::CairoGraph::on_draw(const Cairo::RefPtr<Cairo::Context> &cr)
             // Create major grid lines
             cr->set_dash(dashes1, 0.0);
             cr->set_line_width(0.4);
-            cr->set_source_rgba(axes_colour.get_red(), axes_colour.get_green(), axes_colour.get_blue(), 0.75 * axes_colour.get_alpha());
+            cr->set_source_rgba(axes_colour.get_red(), axes_colour.get_green(), axes_colour.get_blue(), 
+                                0.75 * axes_colour.get_alpha());
             cr->move_to(w * OFFSET_X, h * OFFSET_Y);
             cr->line_to(w * (OFFSET_X + GRAPH_WIDTH), h * OFFSET_Y);
             cr->line_to(w * (OFFSET_X + GRAPH_WIDTH), h * (OFFSET_Y + GRAPH_HEIGHT));
@@ -95,7 +118,8 @@ bool CGraph::CairoGraph::on_draw(const Cairo::RefPtr<Cairo::Context> &cr)
             cr->stroke();
 
             // create minor gridlines
-            cr->set_source_rgba(axes_colour.get_red(), axes_colour.get_green(), axes_colour.get_blue(), 0.60 * axes_colour.get_alpha());
+            cr->set_source_rgba(axes_colour.get_red(), axes_colour.get_green(), axes_colour.get_blue(), 
+                                0.60 * axes_colour.get_alpha());
             cr->set_dash(dashes2, 0.0);
             cr->move_to(w * (OFFSET_X + 0.25 * GRAPH_WIDTH), h * (OFFSET_Y));
             cr->line_to(w * (OFFSET_X + 0.25 * GRAPH_WIDTH), h * (OFFSET_Y + GRAPH_HEIGHT)); // quarter graph
@@ -150,7 +174,8 @@ bool CGraph::CairoGraph::on_draw(const Cairo::RefPtr<Cairo::Context> &cr)
         // draw a border for system themes
         if ("Default" == current_theme)
         {
-            cr->set_source_rgba(border_colour.get_red(), border_colour.get_green(), border_colour.get_blue(), border_colour.get_alpha());
+            cr->set_source_rgba(border_colour.get_red(), border_colour.get_green(), 
+                                border_colour.get_blue(), border_colour.get_alpha());
             cr->set_line_width(0.0030);
             cr->rectangle(0.0, 0.0, 1.0, 1.0);
             cr->stroke();
@@ -183,7 +208,7 @@ bool CGraph::CairoGraph::on_draw(const Cairo::RefPtr<Cairo::Context> &cr)
         cr->fill();
     }
 
-    return true;
+    //return true; 3.0
 }
 
 void CGraph::CairoGraph::draw_series(const Cairo::RefPtr<Cairo::Context> &cr)
@@ -265,29 +290,6 @@ void CGraph::CairoGraph::draw_series(const Cairo::RefPtr<Cairo::Context> &cr)
 
 void CGraph::CairoGraph::update_graph()
 {
-     queue_draw_area(0, 0, get_allocation().get_width(), get_allocation().get_height());
-}
-
-void CGraph::CairoGraph::get_preferred_width_vfunc(int &minimum_width, int &natural_width) const
-{
-    minimum_width = 256;
-    natural_width = 580;
-}
-
-void CGraph::CairoGraph::get_preferred_height_vfunc(int &minimum_height, int &natural_height) const
-{
-    minimum_height = 256;
-    natural_height = 512;
-}
-
-void CGraph::CairoGraph::get_preferred_width_for_height_vfunc(int, int &minimum_width, int &natural_width) const
-{
-    minimum_width = 256;
-    natural_width = 580;
-}
-
-void CGraph::CairoGraph::get_preferred_height_for_width_vfunc(int, int &minimum_height, int &natural_height) const
-{
-    minimum_height = 256;
-    natural_height = 512;
+    //queue_draw_area(0, 0, get_allocation().get_width(), get_allocation().get_height());
+    this->queue_draw();
 }

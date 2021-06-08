@@ -33,6 +33,8 @@
 #include <gtkmm/switch.h>
 #include <gtkmm/sizegroup.h>
 #include <gtkmm/separator.h>
+#include <gtkmm/aboutdialog.h>
+#include <gtkmm/messagedialog.h>
 #include <gtkmm/colorbutton.h>
 #include <glibmm/i18n.h>
 
@@ -58,6 +60,7 @@ private:
 	Gtk::Switch *setscifiy;
 	Gtk::Switch *setscifix;
 	Gtk::Switch *hidelegend;
+	Gtk::Switch *preferdark;
 	Gtk::Label selectgraphlabel;
 	Gtk::Label selectthemelabel;
 	Gtk::Label start_velocity_label;
@@ -77,6 +80,8 @@ private:
 	Gtk::ComboBoxText *selectlinestyle;
 	Gtk::ComboBoxText *graphboxstyle;
 	Gtk::ColorButton *linecolour;
+	std::unique_ptr<Gtk::AboutDialog> aboutdialog;
+	std::unique_ptr<Gtk::MessageDialog> help_dialog;
 	Glib::RefPtr<Gtk::SizeGroup> sizegroup;
 	bool single_series = true;
 	void make_plot();

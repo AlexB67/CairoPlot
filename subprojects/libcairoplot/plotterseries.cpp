@@ -60,7 +60,8 @@ void CGraph::CairoGraph::add_multi_series(  const std::vector<std::vector<double
         set_series_colours();
 
     if (serieslinestyle.size() < numpoints.size()) // The user didn't set linestyles for one or more plots so auto assign
-        for (size_t i = serieslinestyle.size(); i < numpoints.size(); ++i) serieslinestyle.emplace_back(CairoGraphLineStyle::SOLID_LINE);
+        for (size_t i = serieslinestyle.size(); i < numpoints.size(); ++i) 
+            serieslinestyle.emplace_back(CairoGraphLineStyle::SOLID_LINE);
 }
 
 void CGraph::CairoGraph::add_series(const std::vector<double> &xvalues, 
@@ -145,7 +146,8 @@ void CGraph::CairoGraph::init_plots(size_t numplots)
 
     set_series_colours();
     // If line styles have not been set auto assign
-    for ( size_t i = serieslinestyle.size(); i < numplots; ++i) serieslinestyle.emplace_back(CairoGraphLineStyle::SOLID_LINE);
+    for ( size_t i = serieslinestyle.size(); i < numplots; ++i) 
+        serieslinestyle.emplace_back(CairoGraphLineStyle::SOLID_LINE);
 
 }
 

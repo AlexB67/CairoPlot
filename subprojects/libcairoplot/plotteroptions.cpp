@@ -37,7 +37,8 @@ void CGraph::CairoGraph::set_background_colour(const Gdk::RGBA colour1, const Gd
 
     bg_colour1 = colour1;
     bg_colour2 = colour2;
-    queue_draw_area(0, 0, get_allocation().get_width(), get_allocation().get_height());
+    //queue_draw_area(0, 0, get_allocation().get_width(), get_allocation().get_height());
+    this->queue_draw();
 }
 
 void CGraph::CairoGraph::set_background_colour(const Gdk::RGBA colour1)
@@ -45,14 +46,16 @@ void CGraph::CairoGraph::set_background_colour(const Gdk::RGBA colour1)
     //! Set a custom graph backgroud colour.
     bg_colour1 = colour1;
     bg_colour2 = colour1;
-    queue_draw_area(0, 0,  get_allocation().get_width(), get_allocation().get_height());
+    //queue_draw_area(0, 0,  get_allocation().get_width(), get_allocation().get_height());
+    this->queue_draw();
 }
 
 void CGraph::CairoGraph::set_axes_colour(const Gdk::RGBA colour)
 {
      //! Set axes colour. The same colour will be used for axes labels
     axes_colour = colour;
-    queue_draw_area(0, 0,  get_allocation().get_width(), get_allocation().get_height());
+    //queue_draw_area(0, 0,  get_allocation().get_width(), get_allocation().get_height());
+    this->queue_draw();
 }
 
 void CGraph::CairoGraph::set_line_colour(const size_t seriesnum, Gdk::RGBA colour)
