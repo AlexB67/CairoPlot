@@ -205,8 +205,20 @@ CairoplotWindow::CairoplotWindow(const Glib::RefPtr<Gtk::Application>& app)
 		
 		graph->update_graph();
 	});
-	
+
+	// TODO Move this to plotter lib
 	Gtk::Settings::get_default()->property_gtk_theme_name().signal_changed().connect([this](){
+
+		const Glib::ustring& active_theme = Gtk::Settings::get_default()->property_gtk_theme_name().get_value();
+
+		if (active_theme.find("dark") != Glib::ustring::npos || active_theme.find("Dark") != Glib::ustring::npos)
+			preferdark->set_sensitive(false);
+		else
+		{
+			preferdark->set_sensitive(true);
+			preferdark->set_active(true);
+		}
+		
 		graph->set_theme("Default");
 		graph->update_graph();
 	});
@@ -298,7 +310,7 @@ CairoplotWindow::CairoplotWindow(const Glib::RefPtr<Gtk::Application>& app)
 	maingrid.attach(grid, 0, 0);
 	maingrid.attach(graphcontrolframe, 1, 0);
 	set_child(maingrid);
-	selecttheme->set_active(3);
+	selecttheme->set_active(5);
 	selectlinestyle->set_active(0);
 	graphboxstyle->set_active(0);
 	selectgraph->set_active(0);
@@ -321,9 +333,15 @@ void CairoplotWindow::create_header_and_menus()
    	menubutton.set_tooltip_text(_("Opens the menu."));
 	headerbar.pack_end(menubutton);
 	preferdark = Gtk::make_managed<Gtk::Switch>();
-	preferdark->set_tooltip_text("Enable or disable the \"Prefer dark theme\" option.");
+	preferdark->set_tooltip_text("Enable or disable the \"Prefer dark theme\" option (if a light theme is active)." \
+	                             " If a dark theme is the default this will be disabled.");
+
 	headerbar.pack_end(*preferdark);
 	preferdark->set_active();
+
+	const Glib::ustring& active_theme = Gtk::Settings::get_default()->property_gtk_theme_name().get_value();
+	if (active_theme.find("dark") != Glib::ustring::npos || active_theme.find("Dark") != Glib::ustring::npos)
+		preferdark->set_sensitive(false);
 
 	preferdark->property_active().signal_changed().connect([this](){
 		Gtk::Settings::get_default()->property_gtk_application_prefer_dark_theme().set_value(preferdark->get_active());
