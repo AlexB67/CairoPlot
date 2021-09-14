@@ -80,7 +80,7 @@ CairoplotWindow::CairoplotWindow(const Glib::RefPtr<Gtk::Application>& app)
 	graphboxstyle->insert(2, "Box only");
 	graphboxstyle->insert(3, "Axes only");
 
-	graphboxstyle->signal_changed().connect([this](){
+	graphboxstyle->signal_changed().connect((sigc::track_obj([this](){
 		switch(graphboxstyle->get_active_row_number())
 		{
 			case 0:
@@ -100,11 +100,11 @@ CairoplotWindow::CairoplotWindow(const Glib::RefPtr<Gtk::Application>& app)
 		}
 
 		graph->update_graph();
-	});
+	}, *this)));
 
 
 
-	selectlinestyle->signal_changed().connect([this](){
+	selectlinestyle->signal_changed().connect((sigc::track_obj([this](){
 
 		switch(selectlinestyle->get_active_row_number())
 		{
@@ -130,7 +130,7 @@ CairoplotWindow::CairoplotWindow(const Glib::RefPtr<Gtk::Application>& app)
 
 		graph->update_graph();
 
-	});
+	}, *this)));
 
 	Gdk::RGBA col; col.set_rgba(0.0, 1.0, 1.0, 1.0);
 	linecolour->set_rgba(col);
@@ -158,20 +158,20 @@ CairoplotWindow::CairoplotWindow(const Glib::RefPtr<Gtk::Application>& app)
 	sizegroup->add_widget(*gravitational_constant);
 	sizegroup->add_widget(*selectlinestyle);
 
-	selectgraph->signal_changed().connect([this](){
+	selectgraph->signal_changed().connect((sigc::track_obj([this](){
 		if (0 == selectgraph->get_active_row_number()) single_series = true;
 		else single_series = false;
 		make_plot();
-	});
+	}, *this)));
 
-	linecolour->signal_color_set().connect([this](){
+	linecolour->signal_color_set().connect((sigc::track_obj([this](){
 
 		Gdk::RGBA col = linecolour->get_rgba();
 		graph->set_line_colour(0, col);
 		graph->update_graph();
-	});
+	}, *this)));
 
-	selecttheme->signal_changed().connect([this](){
+	selecttheme->signal_changed().connect((sigc::track_obj([this](){
 
 		Gdk::RGBA col; col.set_rgba(0.0, 1.0, 1.0, 1.0);
 		linecolour->set_rgba(col);
@@ -204,10 +204,10 @@ CairoplotWindow::CairoplotWindow(const Glib::RefPtr<Gtk::Application>& app)
 		if (single_series == true) graph->set_line_colour(0, col);
 		
 		graph->update_graph();
-	});
+	}, *this)));
 
 	// TODO Move this to plotter lib
-	Gtk::Settings::get_default()->property_gtk_theme_name().signal_changed().connect([this](){
+	Gtk::Settings::get_default()->property_gtk_theme_name().signal_changed().connect((sigc::track_obj([this](){
 
 		const Glib::ustring& active_theme = Gtk::Settings::get_default()->property_gtk_theme_name().get_value();
 
@@ -221,7 +221,7 @@ CairoplotWindow::CairoplotWindow(const Glib::RefPtr<Gtk::Application>& app)
 		
 		graph->set_theme("Default");
 		graph->update_graph();
-	});
+	}, *this)));
 
 	// create a graph and connect signals
 
@@ -229,15 +229,15 @@ CairoplotWindow::CairoplotWindow(const Glib::RefPtr<Gtk::Application>& app)
 	start_velocity->signal_changed().connect(sigc::mem_fun(*this, &CairoplotWindow::make_plot));
 	start_time->signal_changed().connect(sigc::mem_fun(*this, &CairoplotWindow::make_plot));
 
-	setscifiy->property_active().signal_changed().connect([this](){
+	setscifiy->property_active().signal_changed().connect((sigc::track_obj([this](){
 		graph->use_scientific_notation(setscifix->get_active(), setscifiy->get_active());
 		graph->update_graph();
-	});
+	}, *this)));
 
-	setscifix->property_active().signal_changed().connect([this](){
+	setscifix->property_active().signal_changed().connect((sigc::track_obj([this](){
 		graph->use_scientific_notation(setscifix->get_active(), setscifiy->get_active());
 		graph->update_graph();
-	});
+	}, *this)));
 
 	hidelegend->property_active().signal_changed().connect(sigc::mem_fun(*this, &CairoplotWindow::make_plot)); // lazy compete redraw
 
@@ -343,12 +343,12 @@ void CairoplotWindow::create_header_and_menus()
 	if (active_theme.find("dark") != Glib::ustring::npos || active_theme.find("Dark") != Glib::ustring::npos)
 		preferdark->set_sensitive(false);
 
-	preferdark->property_active().signal_changed().connect([this](){
+	preferdark->property_active().signal_changed().connect((sigc::track_obj([this](){
 		Gtk::Settings::get_default()->property_gtk_application_prefer_dark_theme().set_value(preferdark->get_active());
 		graph->set_theme("Default");
 		graph->update_graph();
 		selecttheme->set_active(5);
-	});
+	}, *this)));
 
 	winmenu = Gio::Menu::create();
 	winmenu->append(_("_About"), "win.about");
@@ -359,18 +359,18 @@ void CairoplotWindow::create_header_and_menus()
 
 	m_app->set_accel_for_action("win.quit", "<Ctrl>q");
 
-	add_action("help", [this](){
+	add_action("help", (sigc::track_obj([this](){
     	help_dialog->show();
 		help_dialog->present();
-	});
+	}, *this)));
 
 	add_action("quit", sigc::mem_fun(*this, &CairoplotWindow::close));
 
 	about();
-	add_action("about", [this](){
+	add_action("about", (sigc::track_obj([this](){
 		aboutdialog->show();
 		aboutdialog->present();
-	});
+	}, *this)));
 
 	Glib::ustring message
 	= _("To zoom in hold down the left mouse button and drag out a rectanglular area, then release. Right click resets. "  
@@ -383,7 +383,7 @@ void CairoplotWindow::create_header_and_menus()
 	help_dialog->set_secondary_text(message);
 	help_dialog->set_modal(true);
 	help_dialog->signal_response().connect(
-    sigc::hide([this](){help_dialog->hide();}));
+    sigc::hide((sigc::track_obj([this](){help_dialog->hide();}, *this))));
 }
 
 void CairoplotWindow::about()
