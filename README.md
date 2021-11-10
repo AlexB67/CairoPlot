@@ -1,7 +1,7 @@
 ### CairoPlot- Plotting with Cairo and GTKMM4
-CairoPlot is a small library I developed to make 2D static and animated Plots in gtkmm4 applications. 
+CairoPlot is a small library I developed to make 2D static and animated Plots in gtkmm4 applications. It is used in my TCalc project. This is a small demo of what can de done with gtkmm and cairomm,  it shows how the library can be utilised. It helps if you have Nimbus Roman fonts installed if you desire a TeX like style for graph legends.
 
-It is used in my TCalc project. This is a small demo of what can de done with gtkmm and cairomm,  it shows how the library can be utilised. It helps if you have Nimbus Roman fonts installed if you desire a TeX like style for graph legends.
+Note: This is gtkmm4 version. If you wish to use the older gtkmm3 version git checkout  the cairoplot-gtkmm3 branch.
 
 ### Required packages
 
@@ -30,7 +30,7 @@ dnf search appstream
 ```
 
 etc. 
-###Building the software
+### Building the software
 ```
 git clone https://github.com/AlexB67/CairoPlot.git
 $cd CairoPlot
