@@ -35,6 +35,7 @@ CairoplotWindow::CairoplotWindow(const Glib::RefPtr<Gtk::Application>& app)
 	graphframe.set_hexpand(true);
 
 	graph = Gtk::make_managed<CGraph::CairoGraph>();
+	graph2 = Gtk::make_managed<CGraph::CairoGraph>();
 	selectgraph = Gtk::make_managed<Gtk::ComboBoxText>();
 	selectgraph->set_margin_top(10);
 	selecttheme = Gtk::make_managed<Gtk::ComboBoxText>();
@@ -204,6 +205,8 @@ CairoplotWindow::CairoplotWindow(const Glib::RefPtr<Gtk::Application>& app)
 		if (single_series == true) graph->set_line_colour(0, col);
 		
 		graph->update_graph();
+		graph2->set_theme("Default"); // exclude
+		graph2->update_graph();
 	}, *this)));
 
 	// TODO Move this to plotter lib
@@ -221,6 +224,9 @@ CairoplotWindow::CairoplotWindow(const Glib::RefPtr<Gtk::Application>& app)
 		
 		graph->set_theme("Default");
 		graph->update_graph();
+		graph2->set_theme("Default");
+		graph2->update_graph();
+
 	}, *this)));
 
 	// create a graph and connect signals
@@ -309,35 +315,118 @@ CairoplotWindow::CairoplotWindow(const Glib::RefPtr<Gtk::Application>& app)
 
 	maingrid.attach(grid, 0, 0);
 	maingrid.attach(graphcontrolframe, 1, 0);
-	set_child(maingrid);
+	
+
+	stack.add(maingrid, _("Plot 1"), _("Plot 1"));
+	stack.add(maingrid2, _("Plot 2"), _("Plot 2"));
+	switcher.set_stack(stack);
 	selecttheme->set_active(5);
 	selectlinestyle->set_active(0);
 	graphboxstyle->set_active(0);
 	selectgraph->set_active(0);
 	selectgraph->grab_focus();
+
+	set_child(stack);
 	
+	// plot 2
+	maingrid2.set_margin(10);
+	scale2.set_orientation(Gtk::Orientation::VERTICAL);
+	scale2.set_vexpand(true);
+	scale2.set_range(3 * M_PI, 7 * M_PI);
+	scale2.set_show_fill_level(true);
+
+	scalecon2 = scale2.signal_value_changed().connect((sigc::track_obj([this](){
+		if (!is_animation) make_plot2();
+	}, *this)));
+
+	button_start2.signal_clicked().connect(sigc::mem_fun(*this, &CairoplotWindow::on_animation_clicked));
+	button_stop2.signal_clicked().connect(sigc::mem_fun(*this, &CairoplotWindow::on_stop_clicked));
+	button_faster.signal_clicked().connect(sigc::mem_fun(*this, &CairoplotWindow::on_faster_clicked));
+	button_slower.signal_clicked().connect(sigc::mem_fun(*this, &CairoplotWindow::on_slower_clicked));
+	button_reset.signal_clicked().connect(sigc::mem_fun(*this, &CairoplotWindow::on_reset_clicked));
+	//view-refresh-symbolic
+	
+	graph2->get_graph_grid().set_margin(10);
+	button_start2.set_expand(false);
+	button_start2.set_icon_name("media-playback-start-symbolic");
+	button_start2.set_tooltip_text(_("Play the animation."));
+	
+	button_faster.set_expand(false);
+	button_faster.set_icon_name("media-seek-forward-symbolic");
+	button_faster.set_tooltip_text(_("Speed up the animation."));
+	
+	button_slower.set_expand(false);
+	button_slower.set_icon_name("media-seek-backward-symbolic");
+	button_slower.set_tooltip_text(_("Slow down the animation."));
+
+	button_stop2.set_expand(false);
+	button_stop2.set_icon_name("media-playback-pause-symbolic");
+	button_stop2.set_sensitive(false);
+	button_stop2.set_tooltip_text(_("Pause the animation."));
+
+	button_reset.set_expand(false);
+	button_reset.set_icon_name("media-playback-stop-symbolic");
+	button_reset.set_sensitive(true);
+	button_reset.set_tooltip_text(_("Stop the animation and restore defaults."));
+
+	scalelabel2.set_markup(_("<i>t</i> (cutoff)"));
+	
+	grid2.attach(graph2->create_graph(), 0, 0, 10, 7);
+	controlgrid2.set_row_spacing(10);
+	controlgrid2.set_column_spacing(10);
+	controlgrid2.set_margin(10);
+
+	sep2.set_vexpand(false);
+	animate_label2.set_label(_("Animate"));
+
+	controlgrid2.attach(scale2, 0, 0, 2, 1);
+	controlgrid2.attach(scalelabel2, 0, 1, 2, 1);
+	controlgrid2.attach(sep2, 0, 2, 2, 1);
+	controlgrid2.attach(animate_label2, 0, 3, 2, 1);
+	controlgrid2.attach(button_slower, 0, 4, 1, 1);
+	controlgrid2.attach(button_faster, 1, 4, 1, 1);
+	controlgrid2.attach(button_stop2, 0, 5, 1, 1);
+	controlgrid2.attach(button_start2, 1, 5, 1, 1);
+	controlgrid2.attach(button_reset, 0, 6, 2, 1);
+
+	graphcontrolframe2.set_label(_("Manipulate"));
+	graphcontrolframe2.set_label_align(Gtk::Align::CENTER);
+	graphcontrolframe2.set_margin_start(10);
+	graphcontrolframe2.set_child(controlgrid2);
+
+	graphframe2.set_label(_("Graph"));
+	graphframe2.set_label_align(Gtk::Align::CENTER);
+	graphframe2.set_hexpand(true);
+	graphframe2.set_child(grid2);
+
+	maingrid2.attach(graphframe2, 0, 0);
+	maingrid2.attach(graphcontrolframe2, 1, 0);
+	
+	graph2->get_graph_grid().set_margin(10);
+	graph2->set_title(_("Rabi oscillations: A 2 level system at 3 energy separations 𝜔<sub>21</sub>"));
+	make_plot2();
+
     auto note = Gio::Notification::create(_("cairoplot"));
-    note->set_body("Welcome to Cairo plotting");
+    note->set_body("Welcome to Cairo plotting.");
     m_app->send_notification(_("Cairo Graphs"), note);
 }
 
 void CairoplotWindow::create_header_and_menus()
 {
 	set_titlebar(headerbar);
-	//headerbar.set_show_close_button(true);
 	headerbar.set_show_title_buttons(true);
-	// headerbar.set_title(_("2D Graphs Demo - gtkmm & cariomm"));
-
-	// menubutton.set_image_from_icon_name("open-menu-symbolic", Gtk::ICON_SIZE_BUTTON, true);
+	headerbarlabel.set_markup_with_mnemonic(_("Cairoplot \n<sub>Plot 2D Graphs with gtkmm4 demo</sub>"));
+	headerbar.set_title_widget(headerbarlabel);
 	menubutton.set_icon_name("open-menu-symbolic");
    	menubutton.set_tooltip_text(_("Opens the menu."));
+	headerbar.pack_start(switcher);
 	headerbar.pack_end(menubutton);
 	preferdark = Gtk::make_managed<Gtk::Switch>();
 	preferdark->set_tooltip_text("Enable or disable the \"Prefer dark theme\" option (if a light theme is active)." \
 	                             " If a dark theme is the default this will be disabled.");
 
 	headerbar.pack_end(*preferdark);
-	preferdark->set_active();
+	preferdark->set_active(true);
 
 	const Glib::ustring& active_theme = Gtk::Settings::get_default()->property_gtk_theme_name().get_value();
 	if (active_theme.find("dark") != Glib::ustring::npos || active_theme.find("Dark") != Glib::ustring::npos)
@@ -347,6 +436,8 @@ void CairoplotWindow::create_header_and_menus()
 		Gtk::Settings::get_default()->property_gtk_application_prefer_dark_theme().set_value(preferdark->get_active());
 		graph->set_theme("Default");
 		graph->update_graph();
+		graph2->set_theme("Default");
+		graph2->update_graph();
 		selecttheme->set_active(5);
 	}, *this)));
 
@@ -374,9 +465,10 @@ void CairoplotWindow::create_header_and_menus()
 
 	Glib::ustring message
 	= _("To zoom in hold down the left mouse button and drag out a rectanglular area, then release. Right click resets. "  
-		"Use the controls on the right to change graph properties.");
+		"Use the controls on the right to change graph properties.\n\nUse the start and stop buttons on the second graph to animate. "
+		"Use the fast forward and back buttons to speed up or slow down respectively");
 		Glib::ustring title
-	= _("Graph Zoom");
+	= _("Graph Zoom and Animations");
 
 	help_dialog = std::make_unique<Gtk::MessageDialog>(title, true, Gtk::MessageType::INFO, Gtk::ButtonsType::CLOSE, false);
 	help_dialog->set_transient_for(*this);
@@ -399,7 +491,7 @@ void CairoplotWindow::about()
 	("/org/gnome/plotter/plotter.png", 128, 128, true)));
 	
 	aboutdialog->set_program_name(_("Cairo plot"));
-	aboutdialog->set_version("0.2.0");
+	aboutdialog->set_version("0.3.0");
 	aboutdialog->set_copyright("Alexander Borro");
 	aboutdialog->set_comments(_("Plotting 2D graphs using gtkmm-4.0 and Cairomm-1.16."));
 	aboutdialog->set_license("GPL v3.0    http://www.gnu.org/licenses");
@@ -409,6 +501,142 @@ void CairoplotWindow::about()
 	std::vector<Glib::ustring> list_authors;
 	list_authors.emplace_back("Alexander Borro");
 	aboutdialog->set_authors(list_authors);
+}
+
+void CairoplotWindow::on_animation_clicked()
+{
+	timer2.disconnect();
+	button_start2.set_sensitive(false);
+	button_stop2.set_sensitive(true);
+	is_animation = true;
+	scalecon2.block();
+	graph2->set_sensitive(false);
+	sigc::slot<bool()> slot = sigc::bind(sigc::mem_fun(*this, &CairoplotWindow::make_plot2));
+	timer2 = Glib::signal_timeout().connect(slot, interval);
+}
+
+void CairoplotWindow::on_stop_clicked()
+{
+	stop_was_clicked = true;
+}
+
+void CairoplotWindow::on_faster_clicked()
+{
+	if (interval <= 10)
+	{
+		button_slower.set_sensitive(true);
+		button_faster.set_sensitive(false);
+		interval = 10;
+	}
+	else
+	{
+		interval -= 4;
+		button_slower.set_sensitive(true);
+		timer2.disconnect();
+		sigc::slot<bool()> slot = sigc::bind(sigc::mem_fun(*this, &CairoplotWindow::make_plot2));
+		timer2 = Glib::signal_timeout().connect(slot, interval);
+	}
+}
+
+void CairoplotWindow::on_slower_clicked()
+{
+	if (interval >= 50)
+	{
+		button_faster.set_sensitive(true);
+		button_slower.set_sensitive(false);
+		interval = 50;
+	}
+	else
+	{
+		interval += 4;
+		button_faster.set_sensitive(true);
+		timer2.disconnect();
+		sigc::slot<bool()> slot = sigc::bind(sigc::mem_fun(*this, &CairoplotWindow::make_plot2));
+		timer2 = Glib::signal_timeout().connect(slot, interval);
+	}
+}
+
+void CairoplotWindow::animation_stop_func()
+{
+	button_start2.set_sensitive(true);
+	button_stop2.set_sensitive(false);
+	scalecon2.unblock();
+	graph2->set_sensitive(true);
+	graph2->set_sensitive(true);
+	is_animation = false;
+	stop_was_clicked = false;
+}
+
+void CairoplotWindow::on_reset_clicked()
+{
+	animation_stop_func();
+	button_slower.set_sensitive(true);
+	button_faster.set_sensitive(true);
+
+	if (timer2.connected()) timer2.disconnect();
+	interval = 30;
+	scale2.set_value(3 * M_PI);
+}
+
+bool CairoplotWindow::make_plot2()
+{
+	if (is_animation && stop_was_clicked)
+	{
+		animation_stop_func();
+		return false;
+	}
+
+	constexpr size_t size = 501;
+	constexpr size_t numplots = 3;
+
+	std::vector<double> t(size);
+	std::vector<double> s(size);
+	std::vector<std::vector<double> > xseries(numplots, t);
+	std::vector<std::vector<double> > yseries(numplots, s);
+
+	// Example of multiplot with preset data stored in a vector of vectors
+	const double V = 1.0;
+	const std::vector<double> omega = {{0.0, 2.0, 3.0}};
+	double t_cutoff = scale2.get_value();
+
+	for (size_t k = 0; k < numplots; ++k)
+	{
+		double t = 0;
+		double Omega = std::sqrt(4.0 * V * V + omega[k] * omega[k]);
+		for (size_t i = 0; i < size; ++i)
+		{
+			xseries[k][i] = t;
+			(t < t_cutoff) ? yseries[k][i] = 
+			                 4.0 * V * V * std::pow(std::sin(Omega * t * 0.5), 2) / (Omega * Omega)
+			               : yseries[k][i] = 
+						     4.0 * V * V * std::pow(std::sin(Omega * t_cutoff * 0.5), 2) / (Omega * Omega);
+			t += 0.05;
+		}
+	}
+
+	graph2->set_tick_label_format_x(false, 2);
+	graph2->set_tick_label_format_y(false, 2);
+	graph2->set_axes_labels(_("<i>t </i>|<i>V</i> |"), _("<i>P (t)</i>"));
+
+	std::vector<Glib::ustring> legends(numplots);
+	legends[0] = "<i>λ</i> = 𝜔<sub>21</sub> / |<i>V</i> | = 0";
+	legends[1] = "<i>λ</i> = 𝜔<sub>21</sub> / |<i>V</i> | = 2";
+	legends[2] = "<i>λ</i> = 𝜔<sub>21</sub> / |<i>V</i> | = 3";
+
+	graph2->add_multi_series(xseries, yseries); 	// Copy data for the example. 
+											    // We can also pass by reference with make_copy = false
+
+	graph2->add_multi_legends(legends, 0.7);
+	graph2->update_graph();
+	if (is_animation)
+	{
+		if (scale2.get_value() >= 7 * M_PI)
+			scale2.set_value(3 * M_PI);
+		else
+			scale2.set_value(scale2.get_value() + 0.05);
+	}
+	
+	return true;
 }
 
 void CairoplotWindow::make_plot()

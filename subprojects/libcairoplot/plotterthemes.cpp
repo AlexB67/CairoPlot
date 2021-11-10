@@ -67,8 +67,8 @@ void CGraph::CairoGraph::set_theme(const Glib::ustring& theme, bool automatic)
         const auto context = xvalue->get_style_context();
         axes_colour.set(context->get_color().to_string());
 
-        if(Gtk::Settings::get_default()->property_gtk_theme_name().get_value() != "Adwaita"
-           && Gtk::Settings::get_default()->property_gtk_theme_name().get_value() != "Adwaita-dark")
+        if(Gtk::Settings::get_default()->property_gtk_theme_name().get_value().lowercase() != "adwaita"
+           && Gtk::Settings::get_default()->property_gtk_theme_name().get_value().lowercase() != "adwaita-dark")
         {
             bg_colour1.set_alpha(0.0);
             bg_colour2.set_alpha(0.0);
@@ -76,7 +76,7 @@ void CGraph::CairoGraph::set_theme(const Glib::ustring& theme, bool automatic)
             return;
         }
         
-        else if(Gtk::Settings::get_default()->property_gtk_theme_name().get_value() == "Adwaita-dark"
+        else if(Gtk::Settings::get_default()->property_gtk_theme_name().get_value().lowercase() == "adwaita-dark"
           || Gtk::Settings::get_default()->property_gtk_application_prefer_dark_theme().get_value() == true)
         {
             bg_colour1.set_rgba(0.176, 0.176, 0.176, 1.0);
@@ -84,7 +84,7 @@ void CGraph::CairoGraph::set_theme(const Glib::ustring& theme, bool automatic)
             border_colour.set_rgba(0.05, 0.05, 0.05, 1.0);
             return;
         }
-        else if (Gtk::Settings::get_default()->property_gtk_theme_name().get_value() == "Adwaita")
+        else if (Gtk::Settings::get_default()->property_gtk_theme_name().get_value().lowercase() == "adwaita")
         {
             bg_colour1.set_rgba(0.99, 0.99, 0.99, 1.0);
             bg_colour2 = bg_colour1;
