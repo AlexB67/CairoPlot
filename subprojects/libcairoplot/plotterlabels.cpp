@@ -367,6 +367,7 @@ void CGraph::CairoGraph::create_labels(const Cairo::RefPtr<Cairo::Context> &cr)
    for (auto &i : text_objects)
    {
         Pango::FontDescription text_font;
+        if (text_object_font_family.length()) text_font.set_family(text_object_font_family);
         Glib::ustring text = std::get<0>(i);
         double x = std::get<1>(i) * GRAPH_WIDTH + OFFSET_X;
         double y = std::get<2>(i) * GRAPH_HEIGHT + OFFSET_Y;

@@ -179,7 +179,8 @@ void CGraph::CairoGraph::add_multi_legends(const std::vector<Glib::ustring> &leg
     legend_offsety = offsety * GRAPH_HEIGHT;
 }
 
-void CGraph::CairoGraph::add_text_objects(const std::vector<std::tuple<Glib::ustring, double, double, double, bool> >& text)
+void CGraph::CairoGraph::add_text_objects(const std::vector<std::tuple<Glib::ustring, double, double, double, bool> >& text,
+                                          Glib::ustring text_object_fontfamily)
 {
     //! Add a text object to the graph
     //! string: text
@@ -187,6 +188,8 @@ void CGraph::CairoGraph::add_text_objects(const std::vector<std::tuple<Glib::ust
     //! double y with respect to the graph box top left corner
     //! double scale text
     //! bool: Flag to show text if the graph is zoomed: true shows text at all zoom levels. False only shows text when NOT zoomed.
+    //! string: Optional specification for font family
 
-    for (auto &i : text) text_objects.emplace_back(i);  
+    for (auto &i : text) text_objects.emplace_back(i);
+    text_object_font_family = text_object_fontfamily;
 }

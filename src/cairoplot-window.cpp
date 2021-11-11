@@ -18,6 +18,8 @@
 
 #include "cairoplot-window.hpp"
 #include <iostream>
+#include <iomanip>
+#include <glibmm/ustring.h>
 #include <gtkmm/settings.h>
 #include <gtkmm/messagedialog.h>
 
@@ -334,6 +336,8 @@ CairoplotWindow::CairoplotWindow(const Glib::RefPtr<Gtk::Application>& app)
 	scale2.set_vexpand(true);
 	scale2.set_range(3 * M_PI, 7 * M_PI);
 	scale2.set_show_fill_level(true);
+	scale2.set_tooltip_markup
+	(_("The time (in dimensionless units of <i>t</i><sub>C</sub> |<i>V</i> | ) the perturbation is switched off."));
 
 	scalecon2 = scale2.signal_value_changed().connect((sigc::track_obj([this](){
 		if (!is_animation) make_plot2();
@@ -369,7 +373,9 @@ CairoplotWindow::CairoplotWindow(const Glib::RefPtr<Gtk::Application>& app)
 	button_reset.set_sensitive(true);
 	button_reset.set_tooltip_text(_("Stop the animation and restore defaults."));
 
-	scalelabel2.set_markup(_("<i>t</i> (cutoff)"));
+	scalelabel2.set_markup(_("<i>t</i><sub>C</sub> |<i>V</i> |"));
+	scalelabel2.set_tooltip_markup
+	(_("The time (in dimensionless units of <i>t</i><sub>C</sub> |<i>V</i> | ) the perturbation is switched off."));
 	
 	grid2.attach(graph2->create_graph(), 0, 0, 10, 7);
 	controlgrid2.set_row_spacing(10);
@@ -493,7 +499,7 @@ void CairoplotWindow::about()
 	aboutdialog->set_program_name(_("Cairo plot"));
 	aboutdialog->set_version("0.3.0");
 	aboutdialog->set_copyright("Alexander Borro");
-	aboutdialog->set_comments(_("Plotting 2D graphs using gtkmm-4.0 and Cairomm-1.16."));
+	aboutdialog->set_comments(_("Plotting 2D graphs using gtkmm-4.0.4 and Cairomm-1.16."));
 	aboutdialog->set_license("GPL v3.0    http://www.gnu.org/licenses");
 	aboutdialog->set_website("http://www.gtkmm.org");
 	aboutdialog->set_website_label("gtkmm website");
@@ -623,11 +629,22 @@ bool CairoplotWindow::make_plot2()
 	legends[1] = "<i>λ</i> = 𝜔<sub>21</sub> / |<i>V</i> | = 2";
 	legends[2] = "<i>λ</i> = 𝜔<sub>21</sub> / |<i>V</i> | = 3";
 
-	graph2->add_multi_series(xseries, yseries); 	// Copy data for the example. 
+	graph2->add_multi_series(xseries, yseries); // Copy data for the example. 
 											    // We can also pass by reference with make_copy = false
 
 	graph2->add_multi_legends(legends, 0.7);
+
+	std::vector<std::tuple<Glib::ustring, double, double, double, bool>> textobject(1U);
+	std::get<0>(textobject[0]) = Glib::ustring("<i>t</i><sub>C</sub> |<i>V</i> | = ") +
+	                             Glib::ustring::format(std::fixed, std::setprecision(2), scale2.get_value()); 
+	std::get<1>(textobject[0]) = 0.85;
+	std::get<2>(textobject[0]) = 1.20;
+	std::get<3>(textobject[0]) = 1.0;
+	std::get<4>(textobject[0]) = false;
+
+	graph2->add_text_objects(textobject, _("Nimbus Roman"));
 	graph2->update_graph();
+	
 	if (is_animation)
 	{
 		if (scale2.get_value() >= 7 * M_PI)

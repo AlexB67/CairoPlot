@@ -178,6 +178,7 @@ void CGraph::CairoGraph::clear_series()
 {
     xmax = ymax = std::numeric_limits<double>::min();
     xmin = ymin = std::numeric_limits<double>::max();
+    text_object_font_family = "";
     seriescolour.clear();
     serieslinestyle.clear();
     graph_legend.clear();

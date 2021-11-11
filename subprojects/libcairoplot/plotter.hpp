@@ -122,7 +122,8 @@ namespace CGraph
         void set_graph_box_style(const CairoGraphBoxStyle style);
         void set_title(const Glib::ustring &title);
         void set_theme(const Glib::ustring &theme, bool automatic = true);
-        void add_text_objects(const std::vector<std::tuple<Glib::ustring, double, double, double, bool> >& text);
+        void add_text_objects(const std::vector<std::tuple<Glib::ustring, double, double, double, bool> >& text,
+                              Glib::ustring text_object_fontfamily = "");
 
     private:
         double lwidth = 1.0; // default line width
@@ -175,6 +176,7 @@ namespace CGraph
         CairoGraphBoxStyle graphboxstyle;
         CairoGraphPos legend_pos;
         Glib::ustring current_theme;
+        Glib::ustring text_object_font_family;
         Gtk::Grid *grid;
         Gtk::Grid *cursor_grid;
         Gtk::Entry *xvalue;
