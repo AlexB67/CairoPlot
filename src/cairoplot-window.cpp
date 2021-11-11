@@ -497,7 +497,7 @@ void CairoplotWindow::about()
 	("/org/gnome/plotter/plotter.png", 128, 128, true)));
 	
 	aboutdialog->set_program_name(_("Cairo plot"));
-	aboutdialog->set_version("0.3.0");
+	aboutdialog->set_version("0.9.0");
 	aboutdialog->set_copyright("Alexander Borro");
 	aboutdialog->set_comments(_("Plotting 2D graphs using gtkmm-4.0.4 and Cairomm-1.16."));
 	aboutdialog->set_license("GPL v3.0    http://www.gnu.org/licenses");
@@ -609,13 +609,14 @@ bool CairoplotWindow::make_plot2()
 	{
 		double t = 0;
 		double Omega = std::sqrt(4.0 * V * V + omega[k] * omega[k]);
+		double Omega_sq = 4.0 * V * V + omega[k] * omega[k];
 		for (size_t i = 0; i < size; ++i)
 		{
 			xseries[k][i] = t;
 			(t < t_cutoff) ? yseries[k][i] = 
-			                 4.0 * V * V * std::pow(std::sin(Omega * t * 0.5), 2) / (Omega * Omega)
+			                 4.0 * V * V * std::pow(std::sin(Omega * t * 0.5), 2) /  Omega_sq
 			               : yseries[k][i] = 
-						     4.0 * V * V * std::pow(std::sin(Omega * t_cutoff * 0.5), 2) / (Omega * Omega);
+						     4.0 * V * V * std::pow(std::sin(Omega * t_cutoff * 0.5), 2) / Omega_sq;
 			t += 0.05;
 		}
 	}

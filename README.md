@@ -50,11 +50,11 @@ $mkdir build
 $meson build/
 $cd build
 $ninja
-$sudo
 ```
 
 You can run the demo from the build directory with the command
 ```
+cd to build_dir # i.e. path to your build directory
 src/cairoplot
 ```
 
@@ -62,6 +62,11 @@ Installation is not required.
 
 ### Supported features
 Multiple and single plots are supported in a single graph.
-With a little work Wolfram Mathematica Manipulate/Animate style plots can also be produced. See the source code for details.
+With a little work Wolfram Mathematica Manipulate/Animate style plots can also be produced. See the source code for details. The demo exposes most features. My TCalc respository shows additional use cases.
+
+### Using the software in your own project
+
+Simply include the subproject/cairoplot files in your project source file tree. Beyond that, everything is the same as if one were building any gtkmm application. Whether you want build it as a subproject or include the files directly as part of your project is optional.
 
 Enjoy.
+
