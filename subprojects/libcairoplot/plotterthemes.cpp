@@ -26,7 +26,6 @@ void CGraph::CairoGraph::set_theme(const Glib::ustring& theme, bool automatic)
         axes_colour.set_rgba(1.0, 1.0, 1.0, 0.80);
         bg_colour1.set_rgba(0.0, 0.0, 0.0, 1.0);
         bg_colour2.set_rgba(0.28, 0.28, 0.28, 1.0);
-        return;
     }
     else if ("Herculean blue" == theme)
     {
@@ -34,7 +33,6 @@ void CGraph::CairoGraph::set_theme(const Glib::ustring& theme, bool automatic)
         axes_colour.set_rgba(1.0, 1.0, 1.0, 0.80);
         bg_colour1.set_rgba(16.0 / 255.0, 29.0 / 255.0, 53.0 / 255.0, 1.0);
         bg_colour2.set_rgba(5.0 / 255.0, 95.00 / 255.0, 134.0 / 255.0, 1.0);
-        return;
     }
     else if ("Black" == theme)
     {
@@ -42,7 +40,6 @@ void CGraph::CairoGraph::set_theme(const Glib::ustring& theme, bool automatic)
         axes_colour.set_rgba(1.0, 1.0, 1.0, 0.80);
         bg_colour1.set_rgba(0.0, 0.0, 0.0, 1.0);
         bg_colour2.set_rgba(0.0, 0.0, 0.0, 1.0);
-        return;
     }
     else if ("Midnight blue" == theme)
     {
@@ -50,7 +47,6 @@ void CGraph::CairoGraph::set_theme(const Glib::ustring& theme, bool automatic)
         axes_colour.set_rgba(1.0, 1.0, 1.0, 0.80);
         bg_colour1.set_rgba(0.1, 0.1, 0.1, 1.0);
         bg_colour2.set("midnight blue");
-        return;
     }
     else if ("Dark" ==  theme)
     {
@@ -58,7 +54,6 @@ void CGraph::CairoGraph::set_theme(const Glib::ustring& theme, bool automatic)
         axes_colour.set_rgba(1.0, 1.0, 1.0, 0.80);
      	bg_colour1.set_rgba(19.0 / 255.0, 19.0 / 255.0, 25.0 / 255.0, 1.0);
 		bg_colour2.set_rgba(46.0 / 255.0, 48.0 / 255.0, 58.0 / 255.0, 1.0);
-        return;
     }
     else if ("Default" ==  theme)
     {
@@ -73,7 +68,6 @@ void CGraph::CairoGraph::set_theme(const Glib::ustring& theme, bool automatic)
             bg_colour1.set_alpha(0.0);
             bg_colour2.set_alpha(0.0);
             border_colour.set_rgba(0.05, 0.05, 0.05, 0.333);
-            return;
         }
         
         else if(Gtk::Settings::get_default()->property_gtk_theme_name().get_value().lowercase() == "adwaita-dark"
@@ -82,14 +76,12 @@ void CGraph::CairoGraph::set_theme(const Glib::ustring& theme, bool automatic)
             bg_colour1.set_rgba(0.176, 0.176, 0.176, 1.0);
             bg_colour2 = bg_colour1;
             border_colour.set_rgba(0.05, 0.05, 0.05, 1.0);
-            return;
         }
         else if (Gtk::Settings::get_default()->property_gtk_theme_name().get_value().lowercase() == "adwaita")
         {
             bg_colour1.set_rgba(0.99, 0.99, 0.99, 1.0);
             bg_colour2 = bg_colour1;
             border_colour.set_rgba(0.05, 0.05, 0.05, 0.333);
-            return;
         }
         // fall through mixing gtk4 && 3 is a mess, it can happen
         bg_colour1.set_alpha(0.0);
@@ -113,15 +105,17 @@ void CGraph::CairoGraph::set_theme(const Glib::ustring& theme, bool automatic)
 
 void CGraph::CairoGraph::set_series_colours()
 {
+    seriescolour.clear();
+
     if (axes_colour.get_red() < 0.25 && axes_colour.get_green() < 0.25 && axes_colour.get_blue() < 0.25)
     {   // prabably a light theme
         for (size_t i = seriescolour.size(); i < numpoints.size(); ++i)
         {
             Gdk::RGBA colour;
-            colour.set_rgba(0.0,
-                            0.5 * static_cast<double>(numpoints.size() - i) / numpoints.size(),
-                            0.5 * static_cast<double>(numpoints.size() - i) / numpoints.size(), 1.0);
-            seriescolour.emplace_back(colour);
+            colour.set_rgba(0.10 * static_cast<double>((numpoints.size() + 0.75 * i) / (numpoints.size() + i)),
+                            0.45 * static_cast<double>((numpoints.size() - 0.5 * i) / (numpoints.size() + i)),
+                            0.45 * static_cast<double>((numpoints.size() + 0.75 * i) / (numpoints.size() + i)), 1.0);
+            seriescolour.push_back(colour);
         }
     }
     else
@@ -132,7 +126,7 @@ void CGraph::CairoGraph::set_series_colours()
             colour.set_rgba(1.0 * static_cast<double>(i + 1) / numpoints.size(),
                             0.5 + 0.5 * static_cast<double>(i + 1) / numpoints.size(),
                             0.5 + 0.5 * static_cast<double>(i + 1) / numpoints.size(), 1.0);
-            seriescolour.emplace_back(colour);
+            seriescolour.push_back(colour);
         }
     }
 }
