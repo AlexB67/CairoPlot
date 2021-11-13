@@ -79,14 +79,10 @@ void CGraph::CairoGraph::set_theme(const Glib::ustring& theme, bool automatic)
         }
         else if (Gtk::Settings::get_default()->property_gtk_theme_name().get_value().lowercase() == "adwaita")
         {
-            bg_colour1.set_rgba(0.99, 0.99, 0.99, 1.0);
+            bg_colour1.set_rgba(223.0 / 255, 219.0 / 255, 216.0 / 255, 0.75);
             bg_colour2 = bg_colour1;
             border_colour.set_rgba(0.05, 0.05, 0.05, 0.333);
         }
-        // fall through mixing gtk4 && 3 is a mess, it can happen
-        bg_colour1.set_alpha(0.0);
-        bg_colour2.set_alpha(0.0);
-        border_colour.set_rgba(0.05, 0.05, 0.05, 0.333);
     }
     else
     {
@@ -112,7 +108,7 @@ void CGraph::CairoGraph::set_series_colours()
         for (size_t i = seriescolour.size(); i < numpoints.size(); ++i)
         {
             Gdk::RGBA colour;
-            colour.set_rgba(0.10 * static_cast<double>((numpoints.size() + 0.75 * i) / (numpoints.size() + i)),
+            colour.set_rgba(0.05 * static_cast<double>((numpoints.size() + 0.75 * i) / (numpoints.size() + i)),
                             0.45 * static_cast<double>((numpoints.size() - 0.5 * i) / (numpoints.size() + i)),
                             0.45 * static_cast<double>((numpoints.size() + 0.75 * i) / (numpoints.size() + i)), 1.0);
             seriescolour.push_back(colour);
