@@ -2,7 +2,7 @@
 #include <iostream>
 #include "plotter.hpp"
 
-using namespace CarioGraphConstants;
+using namespace CairoGraphConstants;
 
 void CGraph::CairoGraph::create_tickmark_labels(const Cairo::RefPtr<Cairo::Context> &cr)
 {

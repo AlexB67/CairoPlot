@@ -2,7 +2,7 @@
 #include <iostream>
 #include <gdk/gdkevents.h>
 
-using namespace CarioGraphConstants;
+using namespace CairoGraphConstants;
 
 void CGraph::CairoGraph::on_button_press_event(int button, double x, double y)
 {

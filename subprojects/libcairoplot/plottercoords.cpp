@@ -1,6 +1,6 @@
 #include "plotter.hpp"
 
-using namespace CarioGraphConstants;
+using namespace CairoGraphConstants;
 
 double CGraph::CairoGraph::x_to_graph_coords(const double x) const
 {
