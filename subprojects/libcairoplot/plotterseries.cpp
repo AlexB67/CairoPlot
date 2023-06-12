@@ -1,5 +1,8 @@
 #include "plotter.hpp"
+
+#include <cmath>
 #include <iostream>
+#include <limits>
 
 using namespace CarioGraphConstants;
 
@@ -176,8 +179,9 @@ void CGraph::CairoGraph::add_point(size_t seriesnum, const double x, const doubl
 
 void CGraph::CairoGraph::clear_series()
 {
-    xmax = ymax = std::numeric_limits<double>::min();
-    xmin = ymin = std::numeric_limits<double>::max();
+    // add and subtract epsilon to avoid out of range exception from std::stod
+    xmax = ymax = std::numeric_limits<double>::lowest() + std::numeric_limits<double>::epsilon();
+    xmin = ymin = std::numeric_limits<double>::max() - std::numeric_limits<double>::epsilon();
     text_object_font_family = "";
     seriescolour.clear();
     serieslinestyle.clear();
