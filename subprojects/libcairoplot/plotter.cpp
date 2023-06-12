@@ -242,6 +242,11 @@ void CGraph::CairoGraph::draw_series(const Cairo::RefPtr<Cairo::Context> &cr)
 
     for (size_t j = 0; j < numpoints.size(); ++j)
     {
+        if (!numpoints[j])
+        {
+            continue;
+        }
+
         cr->begin_new_path();
 
         double x = x_to_graph_coords(m_px[j][0]) / plot.zoom_factor_x;
