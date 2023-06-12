@@ -1,6 +1,6 @@
 #include "plotter.hpp"
 
-using namespace CarioGraphConstants;
+using namespace CairoGraphConstants;
 
 void CGraph::CairoGraph::set_line_width(const double linewidth)
 {

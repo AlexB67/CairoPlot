@@ -15,7 +15,7 @@
 #include <gtkmm/window.h>
 #include <glibmm/i18n.h>
 
-namespace CarioGraphConstants
+namespace CairoGraphConstants
 {
     constexpr double BOX_LINEWIDTH = 1.5;
     constexpr double GRID_LINEWIDTH = 0.0005; // in scaled coordinates
@@ -30,7 +30,7 @@ namespace CarioGraphConstants
     constexpr int start_height = 256;
     constexpr int start_width = 256;
 
-} // namespace CarioGraphConstants
+} // namespace CairoGraphConstants
 
 enum class CairoGraphLineStyle
 {

@@ -2,7 +2,7 @@
 #include <iomanip>
 #include <iostream>
 
-using namespace CarioGraphConstants;
+using namespace CairoGraphConstants;
 
 CGraph::CairoGraph::CairoGraph()
 {   
